@@ -1,15 +1,20 @@
-import { VersionsIcon, VideoIcon, RetrieveIcon, HomeIcon, UsersIcon, ComposeSparklesIcon, EarthGlobeIcon, MobileDeviceIcon } from '@sanity/icons'
+import { AddUserIcon, HomeIcon, UsersIcon, CaseIcon, EarthGlobeIcon } from '@sanity/icons'
 import { StructureBuilder } from 'sanity/structure'
 
 export default (S: StructureBuilder) => [
-  S.documentTypeListItem('post').title('Posts').icon(RetrieveIcon),
+  S.documentTypeListItem('company').title('Companies').icon(EarthGlobeIcon),
+  S.documentTypeListItem('member').title('Members').icon(AddUserIcon),
   S.divider(),
   S.listItem()
-    .title('Video')
-    .icon(VideoIcon)
-    .child(S.document().schemaType('video').documentId('video').title('Video')),
-  // S.listItem()
-  //   .title('Tastes Selector')
-  //   .icon(VersionsIcon)
-  //   .child(S.document().schemaType('tastesSelector').documentId('tastesSelector').title('Tastes')),
+    .title('Homepage')
+    .icon(HomeIcon)
+    .child(S.document().schemaType('homepage').documentId('homepage').title('Homepage')),
+  S.listItem()
+    .title('Team')
+    .icon(UsersIcon)
+    .child(S.document().schemaType('team').documentId('team').title('Team')),
+  S.listItem()
+    .title('Portfolio')
+    .icon(CaseIcon)
+    .child(S.document().schemaType('portfolio').documentId('portfolio').title('Portfolio')),
 ]
