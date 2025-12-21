@@ -1,0 +1,32 @@
+<footer>
+  <menu class="regular-grid">
+    <li class="current-location">
+      New York, NY
+      <span class="current-time sans uppercase"></span>
+    </li>
+    <li class="current-date">
+      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+    </li>
+  </menu>
+</footer>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', {
+      timeZone: 'America/New_York',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    
+    const timeElement = document.querySelector('.current-time');
+    if (timeElement) {
+      timeElement.textContent = timeString;
+    }
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>

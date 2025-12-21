@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'Cedrat';
+  src: url('/fonts/for-cedrattextweb-regular.woff2') format('woff2'),
+       url('/fonts/for-cedrattextweb-regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Cedrat';
+  src: url('/fonts/for-cedrattextweb-italic.woff2') format('woff2'),
+       url('/fonts/for-cedrattextweb-italic.woff') format('woff');
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Gerstner';
+  src: url('/fonts/Gerstner-ProgrammRegular.woff2') format('woff2'),
+       url('/fonts/Gerstner-ProgrammRegular.woff') format('woff');
+}
+
+body {
+  font-family: 'Cedrat', serif;
+  font-size: 16px;
+  line-height: 20px;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+header,
+footer {
+  padding: var(--gap);
+}
+
+.regular-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+}
+
+.header-logo svg {
+  fill: currentColor;
+}
+
+.header-links,
+.current-location {
+  display: flex;
+  gap: 8px;
+  grid-column: 9 / span 2;
+}
+
+.header-contact,
+.current-date {
+  grid-column: span 2;
+}
+
+main {
+  min-height: calc(100dvh - 52px);
+}

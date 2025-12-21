@@ -44,24 +44,9 @@
 }
 
 html {
-  background-color: #000;
-  color: var(--foreground-color);
+  background-color: #FAF7F4;
+  color: #2E2929;
   overflow-x: hidden;
-}
-
-html.dark {
-  background-color: var(--dark-background-color);
-  color: var(--dark-foreground-color);
-  transition: color var(--transition-time) var(--transition-effect),
-              background-color var(--transition-time) var(--transition-effect);
-}
-
-body {
-  transition: opacity var(--transition-time) var(--transition-effect);
-}
-
-body.fade-out {
-  opacity: 0;
 }
 
 ul,
@@ -113,11 +98,11 @@ input:-webkit-autofill:active {
   text-transform: uppercase;
 }
 
-.display {
-  font-family: 'Acumin Variable', sans-serif;
-  font-variation-settings: 'wght' 900, 'wdth' 50, 'slnt' 0;
-}
-
-.mono {
-  font-family: 'Lab Grotesque Mono', monospace;
+.sans {
+  font-family: 'Gerstner';
+  font-size: 10px;
+  line-height: 10px;
+  letter-spacing: 0.05em;
+  padding: 3px 0 7px;
+  display: inline-block;
 }

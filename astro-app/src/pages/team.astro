@@ -1,0 +1,93 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+import { urlFor } from '../utils/image';
+
+const team = await sanityClient.fetch(
+  groq`*[_type == "team"][0]{
+    teamText,
+    members[]->{
+      _id,
+      name,
+      slug,
+      position,
+      background,
+      focus,
+      mainImage
+    }
+  }`
+);
+---
+
+<Layout title="Team">
+  <section class="team-section regular-grid">    
+    {team?.members && team.members.length > 0 && (
+      <div class="team-members">
+        {team.members.map((member: any) => (
+          <div class="member-card">
+            <div class="member-info">
+              <h2>{member.name}</h2>
+              {member.position && <span class="sans uppercase">{member.position}</span>}
+            </div>
+
+            {member.mainImage && (
+              <div class="member-image">
+                <img 
+                  src={urlFor(member.mainImage).width(400).height(400).url()} 
+                  alt={member.mainImage.alt || member.name}
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+
+    {team?.teamText && (
+      <div class="team-text">
+        <p>{team.teamText}</p>
+      </div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .team-section {
+    padding: 100px var(--gap) 200px;
+  }
+
+  .team-members {
+    grid-column: span 8;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 16px;
+    row-gap: 32px;
+  }
+
+  .team-text {
+    grid-column: span 4;
+  }
+
+  .member-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .member-info {
+    display: flex;
+    gap: 8px;
+    width: calc((var(--column) * 3) + (var(--gap) * 2));
+  }
+
+  .member-image {
+    width: calc((var(--column) * 3) + (var(--gap) * 2));
+  }
+
+  .member-image img {
+    width: 100%;
+    height: auto;
+  }
+</style>
