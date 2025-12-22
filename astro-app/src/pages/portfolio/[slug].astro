@@ -1,0 +1,269 @@
+---
+import type { InferGetStaticParamsType } from "astro";
+import Layout from '../../layouts/Layout.astro';
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+import { urlFor } from '../../utils/image';
+
+const portfolio = await sanityClient.fetch(
+  groq`*[_type == "portfolio"][0]{
+    portfolioText,
+    companies[]->{
+      _id,
+      name,
+      slug,
+      shortDescription,
+      mainImage,
+      investmentStage,
+      investmentDate,
+      location
+    }
+  }`
+);
+
+function formatDate(dateString: string) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+}
+
+const companyCount = portfolio?.companies?.length || 0;
+const formattedCount = companyCount.toString().padStart(2, '0');
+
+export async function getStaticPaths() {
+  const companies = await sanityClient.fetch(
+    groq`*[_type == "company"]{
+      slug
+    }`
+  );
+  
+  return companies.map((company: any) => ({
+    params: { slug: company.slug.current },
+  }));
+}
+
+type Params = InferGetStaticParamsType<typeof getStaticPaths>;
+const { slug } = Astro.params as Params;
+
+const company = await sanityClient.fetch(
+  groq`*[_type == "company" && slug.current == $slug][0]{
+    _id,
+    name,
+    slug,
+    description,
+    shortDescription,
+    mainImage,
+    investmentStage,
+    investmentDate,
+    location,
+    founders,
+    socialMedia[]{
+      _key,
+      text,
+      url
+    },
+    relatedCompanies[]->{
+      _id,
+      name,
+      slug,
+      mainImage
+    }
+  }`,
+  { slug }
+);
+---
+
+<Layout title={company.name} pageSlug="company">
+  <section class="company-page">
+    <div class="company-main-content">
+      {company.mainImage && (
+        <div class="company-image">
+          <img 
+            src={urlFor(company.mainImage).width(1200).height(800).url()} 
+            alt={company.mainImage.alt || company.name}
+          />
+        </div>
+      )}
+      
+      <div class="company-details">
+        <h1>{company.name}</h1>
+        
+        {company.shortDescription && (
+          <p class="short-description">{company.shortDescription}</p>
+        )}
+
+        <div class="company-meta-grid">
+          {company.investmentStage && (
+            <div class="meta-item">
+              <span class="meta-label sans uppercase">Stage</span>
+              <span class="meta-value">{company.investmentStage}</span>
+            </div>
+          )}
+          
+          {company.investmentDate && (
+            <div class="meta-item">
+              <span class="meta-label sans uppercase">Investment Date</span>
+              <span class="meta-value">{formatDate(company.investmentDate)}</span>
+            </div>
+          )}
+          
+          {company.location && (
+            <div class="meta-item">
+              <span class="meta-label sans uppercase">Location</span>
+              <span class="meta-value">{company.location}</span>
+            </div>
+          )}
+          
+          {company.founders && company.founders.length > 0 && (
+            <div class="meta-item">
+              <span class="meta-label sans uppercase">Founders</span>
+              <span class="meta-value">{company.founders.join(', ')}</span>
+            </div>
+          )}
+        </div>
+
+        {company.socialMedia && company.socialMedia.length > 0 && (
+          <div class="social-links">
+            {company.socialMedia.map((link: any) => (
+              <a href={link.url} target="_blank" rel="noopener noreferrer" class="social-link sans uppercase">
+                {link.text}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {company.description && (
+        <div class="company-description">
+          <h2>About</h2>
+          <p>{company.description}</p>
+        </div>
+      )}
+    </div>
+
+    {company.relatedCompanies && company.relatedCompanies.length > 0 && (
+      <div class="related-section">
+        <div class="related-section-header regular-grid">
+          <div class="portfolio-count sans">{formattedCount}</div>
+          <div class="section-title">Related</div>
+          <div class="section-link">
+            <a href="/portfolio">View all</a>
+          </div>
+        </div>
+
+        <div class="related-grid">
+          {company.relatedCompanies.map((related: any) => (
+            <a href={`/portfolio/${related.slug.current}`} class="related-card">
+              {related.mainImage && (
+                <img 
+                  src={urlFor(related.mainImage).width(300).height(300).url()} 
+                  alt={related.mainImage.alt || related.name}
+                />
+              )}
+              <h3>{related.name}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {portfolio?.companies && portfolio.companies.length > 0 && (      
+      <div class="portfolio-list">
+      <div class="portfolio-list-header regular-grid">
+        <div class="portfolio-count sans">{formattedCount}</div>
+        <div class="company-name-info">Companies</div>
+        <div class="portfolio-sorts">
+          <span class="portfolio-sort" data-sort="az">A-Z,</span>
+          <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
+          <span class="portfolio-sort" data-sort="newest">Newest</span>
+        </div>
+      </div>
+      
+        {portfolio.companies.map((company: any) => (
+          <a href={`/portfolio/${company.slug.current}`} class="company-list-item regular-grid">
+            {company.investmentStage && (
+              <span class="sans uppercase">{company.investmentStage}</span>
+            )}
+
+            <div class="company-name-info">
+              <h2 class="company-name">{company.name}</h2>
+              
+              {company.shortDescription && (
+                <span class="company-description">{company.shortDescription}</span>
+              )}
+            </div>
+
+            {company.mainImage && (
+              <div class="company-image">
+                <img 
+                  src={urlFor(company.mainImage).width(400).height(400).url()} 
+                  alt={company.mainImage.alt || company.name}
+                />
+              </div>
+            )}
+
+            {company.investmentDate && (
+              <div class="company-date">
+                {formatDate(company.investmentDate)}
+              </div>
+            )}
+            
+            {company.location && (
+              <div class="company-location">
+                {company.location}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .company-page {
+    padding: 0 0 calc((var(--column) * 3) + (var(--gap) * 2));
+  }
+
+  .company-main-content,
+  .related-section {
+    margin-bottom: 128px;
+  }
+
+  .company-name-info {
+    display: flex;
+    gap: 8px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gap);
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .related-section-header {
+    padding: 4px 0;
+    margin-bottom: var(--gap);
+  }
+
+  .related-section-header .section-title {
+    grid-column: span 7;
+  }
+
+  .related-section,
+  .portfolio-list {
+    padding: 0 var(--gap);
+  }
+
+  .related-section img {
+    width: 100%;
+    height: calc((var(--column) * 3) + (var(--gap) * 2));
+    object-fit: cover;
+  }
+</style>

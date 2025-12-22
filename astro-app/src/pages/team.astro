@@ -20,7 +20,7 @@ const team = await sanityClient.fetch(
 );
 ---
 
-<Layout title="Team">
+<Layout title="Team" pageSlug="team">
   <section class="team-section regular-grid">    
     {team?.members && team.members.length > 0 && (
       <div class="team-members">
@@ -32,12 +32,12 @@ const team = await sanityClient.fetch(
             </div>
 
             {member.mainImage && (
-              <div class="member-image">
+              <a href={`/team/${member.slug.current}`} class="member-image">
                 <img 
                   src={urlFor(member.mainImage).width(400).height(400).url()} 
                   alt={member.mainImage.alt || member.name}
                 />
-              </div>
+              </a>
             )}
           </div>
         ))}
@@ -88,6 +88,7 @@ const team = await sanityClient.fetch(
 
   .member-image img {
     width: 100%;
-    height: auto;
+    height: calc((var(--column) * 3) + (var(--gap) * 2));
+    object-fit: cover;
   }
 </style>

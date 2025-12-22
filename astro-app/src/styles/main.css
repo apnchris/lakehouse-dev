@@ -23,9 +23,21 @@ body {
   line-height: 20px;
 }
 
+body[data-page='home'] {
+  color: #FAF7F4;
+}
+
 header {
   position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+body[data-page='home'] footer {
+  position: fixed;
+  bottom: 0;
   left: 0;
   width: 100%;
   z-index: 100;
@@ -60,4 +72,119 @@ footer {
 
 main {
   min-height: calc(100dvh - 52px);
+}
+
+/* List */
+.portfolio-list {
+  grid-column: span 12;
+}
+
+.portfolio-list .company-image {
+  width: calc((var(--column) * 3) + (var(--gap) * 2));
+  height: calc((var(--column) * 3) + (var(--gap) * 2));
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity .2s ease;
+  left: calc((var(--column) * 5) + (var(--gap) * 5));
+}
+
+.company-list-item {
+  display: grid;
+  position: relative;
+  padding: 4px 0;
+}
+
+.company-list-item:hover::after {
+  opacity: 1;
+}
+
+.company-list-item:hover::before,
+.company-list-item:hover + .company-list-item::before {
+  opacity: 0;
+}
+
+.company-list-item::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 16px);
+  height: 100%;
+  border-radius: 4px;
+  background: rgba(46, 41, 41, 0.05);
+  opacity: 0;
+  transition: opacity .2s ease;
+  z-index: -1;
+}
+
+.company-list-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-image: linear-gradient(to right, #2E292980 33%, rgba(255,255,255,0) 0%);
+  background-position: bottom;
+  background-size: 3px 1px;
+  background-repeat: repeat-x;
+  transition: opacity .2s ease;
+}
+
+.company-list-item .company-name-info {
+  display: flex;
+  grid-column: span 7;
+}
+
+.company-list-item .company-name {
+  display: inline;
+  white-space: nowrap;
+}
+
+.company-list-item .company-date,
+.company-list-item .company-location {
+  grid-column: span 2;
+}
+
+.portfolio-list-header {
+  padding: 4px 0;
+  margin-bottom: var(--gap);
+}
+
+.portfolio-list-header .company-name-info {
+  grid-column: span 7;
+}
+
+.portfolio-sorts {
+  grid-column: span 4;
+}
+
+.portfolio-sort {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity .2s ease;
+}
+
+.portfolio-sort:hover,
+.portfolio-sort.active {
+  opacity: 1;
+}
+
+.company-list-item .company-description {
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.company-list-item:hover .company-description {
+  opacity: .5;
+}
+
+.company-list-item:hover .company-image {
+  opacity: 1;
+}
+
+.company-list-item .company-image img {
+  width: 100%;
 }

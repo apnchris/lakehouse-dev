@@ -1,0 +1,217 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+import { urlFor } from '../utils/image';
+
+const portfolio = await sanityClient.fetch(
+  groq`*[_type == "portfolio"][0]{
+    portfolioText,
+    companies[]->{
+      _id,
+      name,
+      slug,
+      shortDescription,
+      mainImage,
+      investmentStage,
+      investmentDate,
+      location
+    }
+  }`
+);
+
+function formatDate(dateString: string) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+}
+
+const companyCount = portfolio?.companies?.length || 0;
+const formattedCount = companyCount.toString().padStart(2, '0');
+---
+
+<Layout title="Portfolio" pageSlug="portfolio">
+  <section class="portfolio-section regular-grid">    
+    {portfolio?.portfolioText && (
+      <div class="portfolio-text">
+        <p>{portfolio.portfolioText}</p>
+      </div>
+    )}
+
+    {portfolio?.companies && portfolio.companies.length > 0 && (
+      <div class="portfolio-grid">
+        {portfolio.companies.map((company: any) => (
+          <div class="company-card">
+            <a href={`/portfolio/${company.slug.current}`} class="company-image">
+              {company.mainImage && (
+                <img 
+                  src={urlFor(company.mainImage).width(400).height(400).url()} 
+                  alt={company.mainImage.alt || company.name}
+                />
+              )}
+            </a>
+            
+            <div class="company-name-info">
+              <h2>{company.name}</h2>
+              {company.investmentStage && (
+                <span class="sans uppercase">{company.investmentStage}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+
+    {portfolio?.companies && portfolio.companies.length > 0 && (      
+      <div class="portfolio-list">
+      <div class="portfolio-list-header regular-grid">
+        <div class="portfolio-count sans">{formattedCount}</div>
+        <div class="company-name-info">Companies</div>
+        <div class="portfolio-sorts">
+          <span class="portfolio-sort" data-sort="az">A-Z,</span>
+          <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
+          <span class="portfolio-sort" data-sort="newest">Newest</span>
+        </div>
+      </div>
+      
+        {portfolio.companies.map((company: any) => (
+          <a href={`/portfolio/${company.slug.current}`} class="company-list-item regular-grid">
+            {company.investmentStage && (
+              <span class="sans uppercase">{company.investmentStage}</span>
+            )}
+
+            <div class="company-name-info">
+              <h2 class="company-name">{company.name}</h2>
+              
+              {company.shortDescription && (
+                <span class="company-description">{company.shortDescription}</span>
+              )}
+            </div>
+
+            {company.mainImage && (
+              <div class="company-image">
+                <img 
+                  src={urlFor(company.mainImage).width(400).height(400).url()} 
+                  alt={company.mainImage.alt || company.name}
+                />
+              </div>
+            )}
+
+            {company.investmentDate && (
+              <div class="company-date">
+                {formatDate(company.investmentDate)}
+              </div>
+            )}
+            
+            {company.location && (
+              <div class="company-location">
+                {company.location}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .portfolio-section {
+    padding: 100px var(--gap) calc((var(--column) * 3) + (var(--gap) * 2));
+    row-gap: 128px;
+  }
+
+  /* Grid */
+
+  .portfolio-grid {
+    grid-column: span 9;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: var(--gap);
+    row-gap: 32px;
+  }
+
+  .portfolio-text {
+    grid-column: span 3;
+  }
+
+  .company-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .portfolio-grid .company-image {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .company-image img {
+    width: 100%;
+    height: calc((var(--column) * 3) + (var(--gap) * 2));
+    object-fit: cover;
+  }
+
+  .company-name-info {
+    display: flex;
+    gap: 8px;
+  }
+</style>
+
+<script>
+  const sorts = document.querySelectorAll('.portfolio-sort');
+  const listContainer = document.querySelector('.portfolio-list');
+  
+  if (sorts && listContainer) {
+    // Store original company data for sorting
+    const companyItems = Array.from(document.querySelectorAll('.company-list-item'));
+    
+    const companiesData = companyItems.map(item => {
+      const name = item.querySelector('.company-name')?.textContent?.trim() || '';
+      const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
+      return {
+        element: item,
+        name: name,
+        date: dateText ? new Date(dateText) : new Date(0)
+      };
+    });
+
+    sorts.forEach(sort => {
+      sort.addEventListener('click', () => {
+        const sortType = sort.getAttribute('data-sort');
+        
+        // Update active state
+        sorts.forEach(s => s.classList.remove('active'));
+        sort.classList.add('active');
+        
+        // Sort the data
+        let sortedData = [...companiesData];
+        
+        if (sortType === 'az') {
+          sortedData.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortType === 'oldest') {
+          sortedData.sort((a, b) => a.date.getTime() - b.date.getTime());
+        } else if (sortType === 'newest') {
+          sortedData.sort((a, b) => b.date.getTime() - a.date.getTime());
+        }
+        
+        // Reorder DOM elements
+        const header = listContainer.querySelector('.portfolio-list-header');
+        sortedData.forEach(data => {
+          listContainer.appendChild(data.element);
+        });
+        
+        // Keep header at the top
+        if (header) {
+          listContainer.insertBefore(header, listContainer.firstChild);
+        }
+      });
+    });
+    
+    // Set default active sort (A-Z)
+    const azSort = document.querySelector('[data-sort="az"]');
+    if (azSort) {
+      azSort.classList.add('active');
+    }
+  }
+</script>

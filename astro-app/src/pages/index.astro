@@ -1,14 +1,114 @@
 ---
-import Card from "../components/Card.astro";
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
-import { getPosts } from "../utils/sanity";
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+import { urlFor } from '../utils/image';
 
-const posts = await getPosts();
+const homepage = await sanityClient.fetch(
+  groq`*[_type == "homepage"][0]{
+    aboutShort,
+    aboutText,
+    videoPoster,
+    "videoFileUrl": videoFile.asset->url,
+    videoCdn
+  }`
+);
+
+const videoUrl = homepage?.videoCdn || homepage?.videoFileUrl || null;
+const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(1920).url() : null;
 ---
 
 <Layout title="Lakehouse">
-  <section>
-    <!-- {posts.length ? posts.map((post) => <Card post={post} />) : <Welcome />} -->
+  <section class="homepage">
+    <div class="hero-text">
+      {homepage?.aboutShort && (
+        <h1>Lakehouse</h1> <span>{homepage.aboutShort}</span>
+      )}
+      {homepage?.aboutText && (
+        <span class="read-more-trigger sans uppercase">Read more</span>
+        <span class="about-text">{homepage.aboutText}</span>
+      )}
+    </div>
+
+    {videoUrl && (
+      <div class="video-container">
+        <video 
+          autoplay 
+          muted 
+          loop 
+          playsinline
+          poster={posterUrl}
+        >
+          <source src={videoUrl} type="video/mp4" />
+        </video>
+      </div>
+    )}
   </section>
 </Layout>
+
+<style>
+  .hero-text {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    margin: 16px;
+    width: calc( (var(--column) * 4) + (var(--gap) * 3) );
+  }
+
+  .hero-text h1 {
+    display: inline-block;
+    width: 77px;
+    opacity: 0;
+    text-align: center;
+  }
+
+  .about-text {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+
+  .hero-text.show .about-text {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .read-more-trigger {
+    position: absolute;
+    /* transform: translateY(-4px); */
+    cursor: pointer;
+    transition: opacity .2s ease;
+  }
+
+  .hero-text.show .read-more-trigger {
+    opacity: 0;
+  }
+
+  .video-container {
+    position: fixed;
+    width: 100vw;
+    height: 100dvh;
+    top: 0;
+    left: 0;
+    z-index: 5;
+  }
+
+  .video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+
+<script>
+  const trigger = document.querySelector('.read-more-trigger');
+  const heroText = document.querySelector('.hero-text');
+  
+  if (trigger && heroText) {
+    trigger.addEventListener('click', () => {
+      heroText.classList.toggle('show');
+    });
+  }
+</script>
