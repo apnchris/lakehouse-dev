@@ -1,0 +1,106 @@
+---
+import { urlFor } from '../utils/image';
+
+interface RelatedCompany {
+  _id: string;
+  name: string;
+  slug: { current: string };
+  mainImage?: any;
+  investmentStage?: string;
+}
+
+interface Props {
+  relatedCompanies: RelatedCompany[];
+}
+
+const { relatedCompanies } = Astro.props;
+---
+
+{relatedCompanies && relatedCompanies.length > 0 && (
+  <div class="related-companies-section">
+    <div class="related-companies-header regular-grid">
+      <div class="section-title">Related Companies</div>
+    </div>
+
+    <div class="related-companies-grid">
+      {relatedCompanies.map((company) => (
+        <a href={`/portfolio/${company.slug.current}`} class="related-company-card">
+          {company.mainImage && (
+            <div class="related-company-image">
+              <img 
+                src={urlFor(company.mainImage).width(600).height(600).url()} 
+                alt={company.mainImage.alt || company.name}
+              />
+            </div>
+          )}
+          <div class="related-company-info">
+            <h3>{company.name}</h3>
+            {company.investmentStage && (
+              <span class="sans uppercase">{company.investmentStage}</span>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .related-companies-section {
+    padding: calc((var(--column) * 2) + var(--gap)) var(--gap);
+  }
+
+  .related-companies-header {
+    margin-bottom: var(--gap);
+  }
+
+  .related-companies-header .section-title {
+    grid-column: span 12;
+    font-size: 2rem;
+  }
+
+  .related-companies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--gap);
+  }
+
+  .related-company-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s;
+  }
+
+  .related-company-card:hover {
+    opacity: 0.7;
+  }
+
+  .related-company-image {
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .related-company-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .related-company-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .related-company-info h3 {
+    font-size: 1.1rem;
+  }
+
+  .related-company-info span {
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+</style>

@@ -81,6 +81,17 @@ export default defineType({
       }],
     }),
     defineField({
+      name: 'content',
+      title: 'Content',
+      type: 'array',
+      of: [
+        {type: 'textProfiles'},
+        {type: 'relatedCompanies'},
+        {type: 'textImage'},
+        {type: 'fullscreenImage'},
+      ],
+    }),
+    defineField({
       name: 'relatedCompanies',
       title: 'Related',
       type: 'array',

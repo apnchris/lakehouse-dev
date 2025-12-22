@@ -4,6 +4,10 @@ import Layout from '../../layouts/Layout.astro';
 import { sanityClient } from "sanity:client";
 import groq from "groq";
 import { urlFor } from '../../utils/image';
+import TextProfiles from '../../components/TextProfiles.astro';
+import TextImage from '../../components/TextImage.astro';
+import RelatedCompanies from '../../components/RelatedCompanies.astro';
+import FullscreenImage from '../../components/FullscreenImage.astro';
 
 const portfolio = await sanityClient.fetch(
   groq`*[_type == "portfolio"][0]{
@@ -61,6 +65,44 @@ const company = await sanityClient.fetch(
       _key,
       text,
       url
+    },
+    content[]{
+      _type,
+      _key,
+      _type == "textProfiles" => {
+        text,
+        profiles[]{
+          _key,
+          name,
+          position,
+          background,
+          mainImage
+        }
+      },
+      _type == "textImage" => {
+        text,
+        mainImage{
+          ...,
+          alt,
+          caption
+        }
+      },
+      _type == "relatedCompanies" => {
+        relatedCompanies[]->{
+          _id,
+          name,
+          slug,
+          mainImage,
+          investmentStage
+        }
+      },
+      _type == "fullscreenImage" => {
+        mainImage{
+          ...,
+          alt,
+          caption
+        }
+      }
     },
     relatedCompanies[]->{
       _id,
@@ -131,6 +173,26 @@ const company = await sanityClient.fetch(
         </div>
       </div>
     </div>
+
+    {company.content && company.content.length > 0 && (
+      <div class="company-content">
+        {company.content.map((block: any) => {
+          if (block._type === 'textProfiles') {
+            return <TextProfiles profiles={block.profiles} text={block.text} key={block._key} />;
+          }
+          if (block._type === 'textImage') {
+            return <TextImage text={block.text} mainImage={block.mainImage} key={block._key} />;
+          }
+          if (block._type === 'relatedCompanies') {
+            return <RelatedCompanies relatedCompanies={block.relatedCompanies} key={block._key} />;
+          }
+          if (block._type === 'fullscreenImage') {
+            return <FullscreenImage mainImage={block.mainImage} key={block._key} />;
+          }
+          return null;
+        })}
+      </div>
+    )}
 
     {company.relatedCompanies && company.relatedCompanies.length > 0 && (
       <div class="related-section">

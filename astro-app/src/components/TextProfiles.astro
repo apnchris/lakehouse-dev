@@ -1,0 +1,111 @@
+---
+import { urlFor } from '../utils/image';
+
+interface Profile {
+  _key: string;
+  name: string;
+  position: string;
+  background: string;
+  mainImage?: any;
+}
+
+interface Props {
+  profiles: Profile[];
+  text?: string;
+}
+
+const { profiles, text } = Astro.props;
+---
+
+<div class="text-profiles">  
+  {profiles && profiles.length > 0 && (
+    <div class="profiles-grid">
+      {profiles.map((profile) => (
+        <div class="profile-card" key={profile._key}>
+          {profile.mainImage && (
+            <div class="profile-image">
+              <img 
+                src={urlFor(profile.mainImage).width(400).height(400).url()} 
+                alt={profile.mainImage.alt || profile.name}
+              />
+            </div>
+          )}
+          <div class="profile-info">
+            <h3>{profile.name}</h3>
+            {profile.position && (
+              <span class="profile-position sans uppercase">{profile.position}</span>
+            )}
+            {profile.background && (
+              <p class="profile-background">{profile.background}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+
+  {text && (
+    <div class="profiles-background">
+      <p>{text}</p>
+    </div>
+  )}
+</div>
+
+<style>
+  .text-profiles {
+    padding: calc((var(--column) * 2) + var(--gap)) var(--gap);
+  }
+
+  .profiles-background {
+    margin-bottom: calc(var(--column) + var(--gap));
+  }
+
+  .profiles-background p {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+  }
+
+  .profile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .profile-image {
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-info h3 {
+    font-size: 1.25rem;
+  }
+
+  .profile-position {
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+
+  .profile-background {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+</style>

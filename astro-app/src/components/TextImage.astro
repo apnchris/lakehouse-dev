@@ -1,0 +1,66 @@
+---
+import { urlFor } from '../utils/image';
+
+interface Props {
+  text?: string;
+  mainImage?: any;
+}
+
+const { text, mainImage } = Astro.props;
+---
+
+<div class="text-image regular-grid">
+  {mainImage && (
+    <div class="text-image-visual">
+      <img 
+        src={urlFor(mainImage).width(1200).height(800).url()} 
+        alt={mainImage.alt || ''}
+      />
+      {mainImage.caption && (
+        <span class="image-caption sans">{mainImage.caption}</span>
+      )}
+    </div>
+  )}
+  
+  {text && (
+    <div class="text-image-content">
+      <p>{text}</p>
+    </div>
+  )}
+</div>
+
+<style>
+  .text-image {
+    padding: calc((var(--column) * 2) + var(--gap)) var(--gap);
+    gap: calc(var(--gap) * 2);
+  }
+
+  .text-image-visual {
+    grid-column: span 7;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .text-image-visual img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .image-caption {
+    font-size: 0.875rem;
+    opacity: 0.6;
+  }
+
+  .text-image-content {
+    grid-column: span 5;
+    display: flex;
+    align-items: center;
+  }
+
+  .text-image-content p {
+    font-size: 1.25rem;
+    line-height: 1.6;
+  }
+</style>
