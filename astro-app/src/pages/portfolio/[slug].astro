@@ -75,70 +75,61 @@ const company = await sanityClient.fetch(
 
 <Layout title={company.name} pageSlug="company">
   <section class="company-page">
-    <div class="company-main-content">
+    <div class="company-main-content regular-grid">
       {company.mainImage && (
-        <div class="company-image">
+        <div class="company-main-image">
           <img 
             src={urlFor(company.mainImage).width(1200).height(800).url()} 
             alt={company.mainImage.alt || company.name}
           />
         </div>
       )}
-      
-      <div class="company-details">
-        <h1>{company.name}</h1>
-        
-        {company.shortDescription && (
-          <p class="short-description">{company.shortDescription}</p>
-        )}
 
-        <div class="company-meta-grid">
-          {company.investmentStage && (
-            <div class="meta-item">
-              <span class="meta-label sans uppercase">Stage</span>
-              <span class="meta-value">{company.investmentStage}</span>
+      <div class="company-infos">
+        {company.description && (
+          <div class="company-description">
+            <h1>{company.name}</h1>
+            <p>{company.description}</p>
+          </div>
+        )}
+        
+        <div class="company-details">
+          {company.socialMedia && company.socialMedia.length > 0 && (
+            <div class="detail-item top-border">
+              <span class="detail-label sans uppercase">Socials</span>
+              <span class="detail-value">
+                {company.socialMedia.map((link: any, index: number) => (
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" class="social-link">
+                    {link.text}{index < company.socialMedia.length - 1 && ', '}
+                  </a>
+                ))}
+              </span>
             </div>
           )}
           
-          {company.investmentDate && (
-            <div class="meta-item">
-              <span class="meta-label sans uppercase">Investment Date</span>
-              <span class="meta-value">{formatDate(company.investmentDate)}</span>
+          {company.investmentStage && (
+            <div class="detail-item top-border">
+              <span class="detail-label sans uppercase">Invested</span>
+              <span class="detail-value">{company.investmentStage}{company.investmentDate && (", " + formatDate(company.investmentDate))}</span>
             </div>
           )}
+          
           
           {company.location && (
-            <div class="meta-item">
-              <span class="meta-label sans uppercase">Location</span>
-              <span class="meta-value">{company.location}</span>
+            <div class="detail-item top-border">
+              <span class="detail-label sans uppercase">Location</span>
+              <span class="detail-value">{company.location}</span>
             </div>
           )}
           
           {company.founders && company.founders.length > 0 && (
-            <div class="meta-item">
-              <span class="meta-label sans uppercase">Founders</span>
-              <span class="meta-value">{company.founders.join(', ')}</span>
+            <div class="detail-item top-border">
+              <span class="detail-label sans uppercase">Founders</span>
+              <span class="detail-value">{company.founders.join(', ')}</span>
             </div>
           )}
         </div>
-
-        {company.socialMedia && company.socialMedia.length > 0 && (
-          <div class="social-links">
-            {company.socialMedia.map((link: any) => (
-              <a href={link.url} target="_blank" rel="noopener noreferrer" class="social-link sans uppercase">
-                {link.text}
-              </a>
-            ))}
-          </div>
-        )}
       </div>
-
-      {company.description && (
-        <div class="company-description">
-          <h2>About</h2>
-          <p>{company.description}</p>
-        </div>
-      )}
     </div>
 
     {company.relatedCompanies && company.relatedCompanies.length > 0 && (
@@ -160,7 +151,12 @@ const company = await sanityClient.fetch(
                   alt={related.mainImage.alt || related.name}
                 />
               )}
-              <h3>{related.name}</h3>
+              <div class="company-name-info">
+                <h3>{company.name}</h3>
+                {company.investmentStage && (
+                  <span class="sans uppercase">{company.investmentStage}</span>
+                )}
+              </div>
             </a>
           ))}
         </div>
@@ -180,7 +176,7 @@ const company = await sanityClient.fetch(
       </div>
       
         {portfolio.companies.map((company: any) => (
-          <a href={`/portfolio/${company.slug.current}`} class="company-list-item regular-grid">
+          <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
             {company.investmentStage && (
               <span class="sans uppercase">{company.investmentStage}</span>
             )}
@@ -225,6 +221,30 @@ const company = await sanityClient.fetch(
     padding: 0 0 calc((var(--column) * 3) + (var(--gap) * 2));
   }
 
+  .company-main-content {
+    padding: 0 16px;
+  }
+
+  .company-main-image {
+    grid-column: span 8;
+    margin-left: -16px;
+  }
+
+  .company-infos {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 100px 0 16px;
+  }
+
+  .company-main-image img {
+    width: 100%;
+    height: 100dvh;
+    object-fit: cover;
+  }
+
   .company-main-content,
   .related-section {
     margin-bottom: 128px;
@@ -266,4 +286,39 @@ const company = await sanityClient.fetch(
     height: calc((var(--column) * 3) + (var(--gap) * 2));
     object-fit: cover;
   }
+
+  .detail-item {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 8px 0;
+  }
+
+  .detail-item:last-child {
+    padding-bottom: 0;
+  }
+
+  .detail-value {
+    grid-column: span 3;
+  }
+
+  .company-infos h1 {
+    margin-bottom: 16px;
+  }
 </style>
+
+<script>
+  const headerLogo = document.querySelector('.header-logo');
+  const threshold = window.innerHeight; // 100dvh
+
+  function handleScroll() {
+    if (window.scrollY > threshold - 26) {
+      headerLogo?.classList.add('black');
+    } else {
+      headerLogo?.classList.remove('black');
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll);
+  handleScroll(); // Check initial state
+</script>

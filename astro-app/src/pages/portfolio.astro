@@ -75,7 +75,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
       </div>
       
         {portfolio.companies.map((company: any) => (
-          <a href={`/portfolio/${company.slug.current}`} class="company-list-item regular-grid">
+          <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
             {company.investmentStage && (
               <span class="sans uppercase">{company.investmentStage}</span>
             )}

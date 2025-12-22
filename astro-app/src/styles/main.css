@@ -27,6 +27,10 @@ body[data-page='home'] {
   color: #FAF7F4;
 }
 
+body[data-page='company'] .header-logo:not(.black) {
+  color: #FAF7F4;
+}
+
 header {
   position: fixed;
   top: 0;
@@ -54,6 +58,10 @@ footer {
   gap: var(--gap);
 }
 
+.header-logo {
+  transition: color .2s ease;
+}
+
 .header-logo svg {
   fill: currentColor;
 }
@@ -73,6 +81,8 @@ footer {
 main {
   min-height: calc(100dvh - 52px);
 }
+
+
 
 /* List */
 .portfolio-list {
@@ -119,7 +129,11 @@ main {
   z-index: -1;
 }
 
-.company-list-item::before {
+.top-border {
+  position: relative;
+}
+
+.top-border::before {
   content: '';
   position: absolute;
   top: 0;

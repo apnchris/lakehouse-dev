@@ -42,56 +42,65 @@ const member = await sanityClient.fetch(
 
 <Layout title={member.name} pageSlug="member">
   <section class="member-page regular-grid">
-    <div class="member-header">
-      {member.mainImage && (
-        <div class="member-image">
-          <img 
-            src={urlFor(member.mainImage).width(800).height(800).url()} 
-            alt={member.mainImage.alt || member.name}
-          />
-        </div>
+    <div class="member-name-position">
+      <h1>{member.name}</h1>
+      {member.position && (
+        <p class="position sans uppercase">{member.position}</p>
       )}
-      
-      <div class="member-details">
-        <h1>{member.name}</h1>
-        {member.position && (
-          <p class="position sans uppercase">{member.position}</p>
-        )}
-      </div>
     </div>
 
-    {member.background && (
-      <div class="member-section">
-        <h2>Background</h2>
-        <p>{member.background}</p>
+    {member.mainImage && (
+      <div class="member-image">
+        <img 
+          src={urlFor(member.mainImage).width(800).height(800).url()} 
+          alt={member.mainImage.alt || member.name}
+        />
       </div>
     )}
 
-    {member.focus && (
-      <div class="member-section">
-        <h2>Focus</h2>
-        <p>{member.focus}</p>
-      </div>
-    )}
-
-    {member.investmentCompanies && member.investmentCompanies.length > 0 && (
-      <div class="member-section">
-        <h2>Investment Companies</h2>
-        <div class="companies-grid">
-          {member.investmentCompanies.map((company: any) => (
-            <a href={`/portfolio/${company.slug.current}`} class="company-card">
-              {company.logo && (
-                <img 
-                  src={urlFor(company.logo).width(200).height(200).url()} 
-                  alt={company.logo.alt || company.name}
-                />
-              )}
-              <h3>{company.name}</h3>
-            </a>
-          ))}
+    <div class="member-infos">
+      <div class="member-section member-background-focus top-border">
+        <div class="background-focus-triggers">
+          {member.background && (
+            <button data-target="background-section" class="member-content-trigger sans uppercase">
+              Background{member.focus && (',')}
+            </button>
+          )}
+          {member.focus && (
+            <button data-target="focus-section" class="member-content-trigger sans uppercase">
+              Focus
+            </button>
+          )}
+        </div>
+  
+        <div class="background-focus-content">
+          {member.background && (
+            <div id="background-section" class="content-section">
+              <p>{member.background}</p>
+            </div>
+          )}
+          {member.focus && (
+            <div id="focus-section" class="content-section">
+              <p>{member.focus}</p>
+            </div>
+          )}
         </div>
       </div>
-    )}
+
+      {member.investmentCompanies && member.investmentCompanies.length > 0 && (
+        <div class="member-section">
+          <h2>Investment Companies</h2>
+          <div class="companies-grid">
+            {member.investmentCompanies.map((company: any) => (
+              <a href={`/portfolio/${company.slug.current}`} class="company-card top-border">
+                <h3>{company.name}</h3>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+    
   </section>
 </Layout>
 
@@ -100,82 +109,98 @@ const member = await sanityClient.fetch(
     padding: 100px var(--gap) 200px;
   }
 
-  .member-header {
-    grid-column: span 12;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
+  .member-background-focus {
+    display: flex;
+    flex-direction: column;
     gap: var(--gap);
-    margin-bottom: 80px;
+    padding-top: 8px;
+  }
+
+  .member-content-trigger:not(.active) {
+    opacity: .5;
+  }
+
+  .background-focus-triggers {
+    display: flex;
+    gap: 0;
+  }
+
+  .member-content-trigger {
+    padding-left: 4px;
+    padding-right: 4px;
+    transition: opacity .2s ease;
+  }
+
+  .member-name-position {
+    position: fixed;
+    top: var(--gap);
+    left: calc((var(--column) * 1) + (var(--gap) * 2));
+    display: flex;
+    gap: 8px;
   }
 
   .member-image {
-    grid-column: span 6;
+    height: calc(100dvh - 116px);
+    grid-column: span 8;
   }
 
   .member-image img {
-    width: 100%;
-    height: auto;
+    height: 100%;
+    width: calc((var(--column) * 4) + (var(--gap) * 3));
+    margin-left: calc((var(--column) * 1) + (var(--gap) * 1));
+    object-fit: cover;
   }
-
-  .member-details {
-    grid-column: span 6;
+  
+  .member-infos {
+    grid-column: span 4;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 32px;
   }
 
-  .member-details h1 {
-    margin-bottom: 16px;
+  .content-section {
+    display: none;
   }
 
-  .position {
-    font-size: 1.2rem;
-    opacity: 0.7;
-  }
-
-  .member-section {
-    grid-column: span 8;
-    margin-bottom: 60px;
-  }
-
-  .member-section h2 {
-    margin-bottom: 24px;
-  }
-
-  .member-section p {
-    line-height: 1.6;
+  .content-section.active {
+    display: block;
   }
 
   .companies-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 24px;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 8px;
+    margin-top: var(--gap);
   }
 
   .company-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    padding: 24px;
-    border: 1px solid currentColor;
-    text-decoration: none;
-    transition: opacity 0.2s;
-  }
-
-  .company-card:hover {
-    opacity: 0.7;
-  }
-
-  .company-card img {
-    width: 100%;
-    max-width: 120px;
-    height: auto;
-  }
-
-  .company-card h3 {
-    font-size: 1rem;
-    text-align: center;
+    padding-top: 8px;
   }
 </style>
+
+<script>
+  const triggers = document.querySelectorAll('.background-focus-triggers button');
+  
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const targetId = trigger.getAttribute('data-target');
+      const targetSection = document.getElementById(targetId);
+      
+      // Remove active class from all triggers and hide all sections
+      triggers.forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Add active class to clicked trigger and show target section
+      trigger.classList.add('active');
+      targetSection?.classList.add('active');
+    });
+  });
+
+  // Activate first button by default
+  if (triggers.length > 0) {
+    triggers[0].click();
+  }
+</script>
