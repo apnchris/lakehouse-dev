@@ -202,3 +202,35 @@ main {
 .company-list-item .company-image img {
   width: 100%;
 }
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap);
+}
+
+.related-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.related-section-header {
+  padding: 4px 0;
+  margin-bottom: var(--gap);
+}
+
+.related-section-header .section-title {
+  grid-column: span 7;
+}
+
+.related-section,
+.portfolio-list {
+  padding: 0 var(--gap);
+}
+
+.related-section img {
+  width: 100%;
+  height: calc((var(--column) * 3) + (var(--gap) * 2));
+  object-fit: cover;
+}

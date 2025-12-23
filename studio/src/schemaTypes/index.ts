@@ -6,6 +6,7 @@ import textProfiles from './objects/textProfiles'
 import relatedCompanies from './objects/relatedCompanies'
 import textImage from './objects/textImage'
 import fullscreenImage from './objects/fullscreenImage'
+import videoPlayer from './objects/videoPlayer'
 
 // Homepage
 import homepage from './documents/homepage'
@@ -27,6 +28,7 @@ export const schemaTypes = [
   relatedCompanies,
   textImage,
   fullscreenImage,
+  videoPlayer,
 
   homepage,
   

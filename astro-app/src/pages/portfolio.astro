@@ -12,7 +12,7 @@ const portfolio = await sanityClient.fetch(
       name,
       slug,
       shortDescription,
-      mainImage,
+      thumbnailImage,
       investmentStage,
       investmentDate,
       location
@@ -43,10 +43,10 @@ const formattedCount = companyCount.toString().padStart(2, '0');
         {portfolio.companies.map((company: any) => (
           <div class="company-card">
             <a href={`/portfolio/${company.slug.current}`} class="company-image">
-              {company.mainImage && (
+              {company.thumbnailImage && (
                 <img 
-                  src={urlFor(company.mainImage).width(400).height(400).url()} 
-                  alt={company.mainImage.alt || company.name}
+                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                  alt={company.thumbnailImage.alt || company.name}
                 />
               )}
             </a>
@@ -64,15 +64,15 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 
     {portfolio?.companies && portfolio.companies.length > 0 && (      
       <div class="portfolio-list">
-      <div class="portfolio-list-header regular-grid">
-        <div class="portfolio-count sans">{formattedCount}</div>
-        <div class="company-name-info">Companies</div>
-        <div class="portfolio-sorts">
-          <span class="portfolio-sort" data-sort="az">A-Z,</span>
-          <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
-          <span class="portfolio-sort" data-sort="newest">Newest</span>
+        <div class="portfolio-list-header regular-grid">
+          <div class="portfolio-count sans">{formattedCount}</div>
+          <div class="company-name-info">Companies</div>
+          <div class="portfolio-sorts">
+            <span class="portfolio-sort" data-sort="az">A-Z,</span>
+            <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
+            <span class="portfolio-sort" data-sort="newest">Newest</span>
+          </div>
         </div>
-      </div>
       
         {portfolio.companies.map((company: any) => (
           <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
@@ -88,11 +88,11 @@ const formattedCount = companyCount.toString().padStart(2, '0');
               )}
             </div>
 
-            {company.mainImage && (
+            {company.thumbnailImage && (
               <div class="company-image">
                 <img 
-                  src={urlFor(company.mainImage).width(400).height(400).url()} 
-                  alt={company.mainImage.alt || company.name}
+                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                  alt={company.thumbnailImage.alt || company.name}
                 />
               </div>
             )}

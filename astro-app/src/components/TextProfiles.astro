@@ -17,7 +17,7 @@ interface Props {
 const { profiles, text } = Astro.props;
 ---
 
-<div class="text-profiles">  
+<div class="text-profiles regular-grid">  
   {profiles && profiles.length > 0 && (
     <div class="profiles-grid">
       {profiles.map((profile) => (
@@ -30,14 +30,19 @@ const { profiles, text } = Astro.props;
               />
             </div>
           )}
-          <div class="profile-info">
-            <h3>{profile.name}</h3>
-            {profile.position && (
-              <span class="profile-position sans uppercase">{profile.position}</span>
-            )}
-            {profile.background && (
-              <p class="profile-background">{profile.background}</p>
-            )}
+          <div class="profile-infos">
+            <div class="profile-name-position">
+              <h3>{profile.name}</h3>
+              {profile.position && (
+                <span class="profile-position sans uppercase">{profile.position}</span>
+              )}
+            </div>
+
+            <div class="profile-background">
+              {profile.background && (
+                <p class="profile-background" set:html={profile.background.replace(/\n/g, '<br>')} />
+              )}
+            </div>
           </div>
         </div>
       ))}
@@ -46,40 +51,32 @@ const { profiles, text } = Astro.props;
 
   {text && (
     <div class="profiles-background">
-      <p>{text}</p>
+      <p set:html={text.replace(/\n/g, '<br>')} />
     </div>
   )}
 </div>
 
 <style>
   .text-profiles {
-    padding: calc((var(--column) * 2) + var(--gap)) var(--gap);
+    padding: 0 var(--gap);
+    margin-bottom: 128px;
   }
-
+  
   .profiles-background {
-    margin-bottom: calc(var(--column) + var(--gap));
-  }
-
-  .profiles-background p {
-    font-size: 1.5rem;
-    line-height: 1.4;
+    grid-column: 9 / span 4;
   }
 
   .profiles-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--gap);
+    grid-column: 2 / span 6;
   }
 
   .profile-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-  }
-
-  .profile-image {
-    aspect-ratio: 1;
-    overflow: hidden;
+    gap: 8px;
   }
 
   .profile-image img {
@@ -88,24 +85,15 @@ const { profiles, text } = Astro.props;
     object-fit: cover;
   }
 
-  .profile-info {
+  .profile-infos {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 9px;
   }
 
-  .profile-info h3 {
-    font-size: 1.25rem;
-  }
-
-  .profile-position {
-    font-size: 0.875rem;
-    opacity: 0.6;
-  }
-
-  .profile-background {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    opacity: 0.8;
+  .profile-name-position {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
   }
 </style>

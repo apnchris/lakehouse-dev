@@ -1,0 +1,270 @@
+---
+import { urlFor } from '../utils/image';
+
+interface Props {
+  videoPoster?: any;
+  videoFile?: any;
+  videoCdn?: string;
+}
+
+const { videoPoster, videoFile, videoCdn } = Astro.props;
+
+// Determine the video source - prefer CDN, then uploaded file
+const videoSrc = videoCdn || (videoFile?.asset?.url);
+const posterSrc = videoPoster ? urlFor(videoPoster).width(1920).url() : undefined;
+
+// Generate unique ID for this video player instance
+const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="video-player-wrapper regular-grid">
+  <div class="video-player" data-player-id={playerId}>
+    {videoSrc && (
+      <>
+        <video 
+          class="video-element"
+          poster={posterSrc}
+          playsinline
+          preload="metadata"
+        >
+          <source src={videoSrc} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        
+        <div class="video-controls">
+          <button class="play-pause-btn" aria-label="Play/Pause">
+            <svg class="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+            <svg class="pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>
+            </svg>
+          </button>
+          
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-filled"></div>
+            </div>
+          </div>
+          
+          <div class="time-display">
+            <span class="player-current-time">0:00</span>
+            <span class="time-separator">/</span>
+            <span class="total-time">0:00</span>
+          </div>
+          
+          <button class="fullscreen-btn" aria-label="Fullscreen">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</div>
+
+<style>
+  .video-player-wrapper {
+    margin-bottom: 128px;
+    padding: 0 16px;
+  }
+
+  .video-player {
+    grid-column: 1 / -1;
+    position: relative;
+    line-height: 0;
+    background: #000;
+  }
+
+  .video-element {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .video-player:hover .video-controls,
+  .video-controls.active {
+    opacity: 1;
+  }
+
+  .play-pause-btn,
+  .fullscreen-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+
+  .play-pause-btn:hover,
+  .fullscreen-btn:hover {
+    opacity: 0.7;
+  }
+
+  .progress-container {
+    flex: 1;
+    cursor: pointer;
+    padding: 8px 0;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-filled {
+    height: 100%;
+    background: white;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  .time-display {
+    color: white;
+    font-size: 14px;
+    font-family: var(--font-sans, sans-serif);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .time-separator {
+    margin: 0 4px;
+  }
+
+  @media (max-width: 768px) {
+    .video-player-wrapper {
+      margin-bottom: 64px;
+    }
+
+    .video-controls {
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .time-display {
+      font-size: 12px;
+    }
+  }
+</style>
+
+<script define:vars={{ playerId }}>
+  const player = document.querySelector(`[data-player-id="${playerId}"]`);
+  if (player) {
+    const video = player.querySelector('.video-element');
+    const playPauseBtn = player.querySelector('.play-pause-btn');
+    const playIcon = player.querySelector('.play-icon');
+    const pauseIcon = player.querySelector('.pause-icon');
+    const progressContainer = player.querySelector('.progress-container');
+    const progressBar = player.querySelector('.progress-bar');
+    const progressFilled = player.querySelector('.progress-filled');
+    const currentTimeEl = player.querySelector('.player-current-time');
+    const totalTimeEl = player.querySelector('.total-time');
+    const fullscreenBtn = player.querySelector('.fullscreen-btn');
+    const controls = player.querySelector('.video-controls');
+
+    // Format time as M:SS
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return '0:00';
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Toggle play/pause
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      } else {
+        video.pause();
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      }
+    }
+
+    // Update progress bar
+    function updateProgress() {
+      const percent = (video.currentTime / video.duration) * 100;
+      progressFilled.style.width = `${percent}%`;
+      currentTimeEl.textContent = formatTime(video.currentTime);
+    }
+
+    // Seek video
+    function seek(e) {
+      const rect = progressBar.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      video.currentTime = pos * video.duration;
+    }
+
+    // Toggle fullscreen
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        player.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Event listeners
+    playPauseBtn.addEventListener('click', togglePlay);
+    video.addEventListener('click', togglePlay);
+    video.addEventListener('timeupdate', updateProgress);
+    video.addEventListener('loadedmetadata', () => {
+      totalTimeEl.textContent = formatTime(video.duration);
+    });
+    progressContainer.addEventListener('click', seek);
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    // Show controls on video end
+    video.addEventListener('ended', () => {
+      playIcon.style.display = 'block';
+      pauseIcon.style.display = 'none';
+      controls.classList.add('active');
+    });
+
+    // Hide controls after inactivity
+    let controlsTimeout;
+    player.addEventListener('mousemove', () => {
+      controls.classList.add('active');
+      clearTimeout(controlsTimeout);
+      if (!video.paused) {
+        controlsTimeout = setTimeout(() => {
+          controls.classList.remove('active');
+        }, 2000);
+      }
+    });
+
+    player.addEventListener('mouseleave', () => {
+      if (!video.paused) {
+        controls.classList.remove('active');
+      }
+    });
+  }
+</script>

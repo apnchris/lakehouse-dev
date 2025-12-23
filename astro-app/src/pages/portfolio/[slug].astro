@@ -8,6 +8,7 @@ import TextProfiles from '../../components/TextProfiles.astro';
 import TextImage from '../../components/TextImage.astro';
 import RelatedCompanies from '../../components/RelatedCompanies.astro';
 import FullscreenImage from '../../components/FullscreenImage.astro';
+import VideoPlayer from '../../components/VideoPlayer.astro';
 
 const portfolio = await sanityClient.fetch(
   groq`*[_type == "portfolio"][0]{
@@ -17,6 +18,7 @@ const portfolio = await sanityClient.fetch(
       name,
       slug,
       shortDescription,
+      thumbnailImage,
       mainImage,
       investmentStage,
       investmentDate,
@@ -56,6 +58,7 @@ const company = await sanityClient.fetch(
     slug,
     description,
     shortDescription,
+    thumbnailImage,
     mainImage,
     investmentStage,
     investmentDate,
@@ -92,6 +95,7 @@ const company = await sanityClient.fetch(
           _id,
           name,
           slug,
+          thumbnailImage,
           mainImage,
           investmentStage
         }
@@ -102,12 +106,22 @@ const company = await sanityClient.fetch(
           alt,
           caption
         }
+      },
+      _type == "videoPlayer" => {
+        videoPoster,
+        videoFile{
+          asset->{
+            url
+          }
+        },
+        videoCdn
       }
     },
     relatedCompanies[]->{
       _id,
       name,
       slug,
+      thumbnailImage,
       mainImage
     }
   }`,
@@ -189,53 +203,25 @@ const company = await sanityClient.fetch(
           if (block._type === 'fullscreenImage') {
             return <FullscreenImage mainImage={block.mainImage} key={block._key} />;
           }
+          if (block._type === 'videoPlayer') {
+            return <VideoPlayer videoPoster={block.videoPoster} videoFile={block.videoFile} videoCdn={block.videoCdn} key={block._key} />;
+          }
           return null;
         })}
       </div>
     )}
 
-    {company.relatedCompanies && company.relatedCompanies.length > 0 && (
-      <div class="related-section">
-        <div class="related-section-header regular-grid">
-          <div class="portfolio-count sans">{formattedCount}</div>
-          <div class="section-title">Related</div>
-          <div class="section-link">
-            <a href="/portfolio">View all</a>
-          </div>
-        </div>
-
-        <div class="related-grid">
-          {company.relatedCompanies.map((related: any) => (
-            <a href={`/portfolio/${related.slug.current}`} class="related-card">
-              {related.mainImage && (
-                <img 
-                  src={urlFor(related.mainImage).width(300).height(300).url()} 
-                  alt={related.mainImage.alt || related.name}
-                />
-              )}
-              <div class="company-name-info">
-                <h3>{company.name}</h3>
-                {company.investmentStage && (
-                  <span class="sans uppercase">{company.investmentStage}</span>
-                )}
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    )}
-
     {portfolio?.companies && portfolio.companies.length > 0 && (      
       <div class="portfolio-list">
-      <div class="portfolio-list-header regular-grid">
-        <div class="portfolio-count sans">{formattedCount}</div>
-        <div class="company-name-info">Companies</div>
-        <div class="portfolio-sorts">
-          <span class="portfolio-sort" data-sort="az">A-Z,</span>
-          <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
-          <span class="portfolio-sort" data-sort="newest">Newest</span>
+        <div class="portfolio-list-header regular-grid">
+          <div class="portfolio-count sans">{formattedCount}</div>
+          <div class="company-name-info">Companies</div>
+          <div class="portfolio-sorts">
+            <span class="portfolio-sort" data-sort="az">A-Z,</span>
+            <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
+            <span class="portfolio-sort" data-sort="newest">Newest</span>
+          </div>
         </div>
-      </div>
       
         {portfolio.companies.map((company: any) => (
           <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
@@ -254,8 +240,8 @@ const company = await sanityClient.fetch(
             {company.mainImage && (
               <div class="company-image">
                 <img 
-                  src={urlFor(company.mainImage).width(400).height(400).url()} 
-                  alt={company.mainImage.alt || company.name}
+                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                  alt={company.thumbnailImage.alt || company.name}
                 />
               </div>
             )}
@@ -290,6 +276,7 @@ const company = await sanityClient.fetch(
   .company-main-image {
     grid-column: span 8;
     margin-left: -16px;
+    line-height: 0;
   }
 
   .company-infos {
@@ -315,38 +302,6 @@ const company = await sanityClient.fetch(
   .company-name-info {
     display: flex;
     gap: 8px;
-  }
-
-  .related-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--gap);
-  }
-
-  .related-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .related-section-header {
-    padding: 4px 0;
-    margin-bottom: var(--gap);
-  }
-
-  .related-section-header .section-title {
-    grid-column: span 7;
-  }
-
-  .related-section,
-  .portfolio-list {
-    padding: 0 var(--gap);
-  }
-
-  .related-section img {
-    width: 100%;
-    height: calc((var(--column) * 3) + (var(--gap) * 2));
-    object-fit: cover;
   }
 
   .detail-item {

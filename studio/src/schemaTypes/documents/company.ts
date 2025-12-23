@@ -21,6 +21,21 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'thumbnailImage',
+      title: 'Thumbnail image',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alternative text',
+          type: 'string',
+        }),
+      ],
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Main image',
       type: 'image',
@@ -89,19 +104,14 @@ export default defineType({
         {type: 'relatedCompanies'},
         {type: 'textImage'},
         {type: 'fullscreenImage'},
+        {type: 'videoPlayer'},
       ],
-    }),
-    defineField({
-      name: 'relatedCompanies',
-      title: 'Related',
-      type: 'array',
-      of: [{type: 'reference', to: [{type: 'company'}]}],
-    }),
+    })
   ],
   preview: {
     select: {
       title: 'name',
-      media: 'mainImage',
+      media: 'thumbnailImage',
     }
   },
 })
