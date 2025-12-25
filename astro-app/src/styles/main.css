@@ -140,8 +140,8 @@ main {
   left: 0;
   width: 100%;
   height: 1px;
-  background-image: linear-gradient(to right, #2E292980 33%, rgba(255,255,255,0) 0%);
-  background-position: bottom;
+  background-image: radial-gradient(circle, #2E292980 0.5px, rgba(255,255,255,0) 0.5px);
+  background-position: 0 center;
   background-size: 3px 1px;
   background-repeat: repeat-x;
   transition: opacity .2s ease;
@@ -233,4 +233,72 @@ main {
   width: 100%;
   height: calc((var(--column) * 3) + (var(--gap) * 2));
   object-fit: cover;
+}
+
+@media screen and (max-width: 820px) {
+header,
+header nav,
+header nav menu.regular-grid {
+  display: contents;
+}
+
+footer {
+  display: none;
+}
+
+.header-logo {
+  position: fixed;
+  padding: var(--gap);
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.header-links {
+  position: fixed;
+  padding: var(--gap);
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.header-contact {
+  position: fixed;
+  padding: var(--gap);
+  bottom: 0;
+  left: calc(50vw - var(--gap) / 2);
+  z-index: 100;
+}
+
+body:not([data-page="home"])::before {
+  content: "";
+  position: fixed;
+  bottom: 43.5px;
+  left: 0;
+  width: 100vw;
+  height: 72px;
+  background: linear-gradient(to top, #FAF7F4, rgba(250, 247, 244, 0));
+  pointer-events: none;
+  z-index: 99;
+}
+
+body:not([data-page="home"])::after {
+  content: "";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 44px;
+  background: #FAF7F4;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.related-section-header .section-title {
+  grid-column: span 5;
+}
+
+.related-section-header .section-link {
+  grid-column: span 6;
+}
 }

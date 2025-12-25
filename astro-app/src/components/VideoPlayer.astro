@@ -32,31 +32,23 @@ const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;
         </video>
         
         <div class="video-controls">
-          <button class="play-pause-btn" aria-label="Play/Pause">
-            <svg class="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M8 5v14l11-7z" fill="currentColor"/>
-            </svg>
-            <svg class="pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;">
-              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>
-            </svg>
-          </button>
-          
           <div class="progress-container">
             <div class="progress-bar">
               <div class="progress-filled"></div>
             </div>
           </div>
-          
-          <div class="time-display">
-            <span class="player-current-time">0:00</span>
-            <span class="time-separator">/</span>
-            <span class="total-time">0:00</span>
+
+          <div class="time-display sans uppercase">
+            <span class="player-current-time">0:00</span><span class="time-separator">/</span><span class="total-time">0:00</span>
           </div>
+
+          <button class="play-pause-btn" aria-label="Play/Pause">
+            <span class="play-icon">Play</span>
+            <span class="pause-icon" style="display: none;">Pause</span>
+          </button>
           
           <button class="fullscreen-btn" aria-label="Fullscreen">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="currentColor"/>
-            </svg>
+            Fullscreen
           </button>
         </div>
       </>
@@ -75,99 +67,74 @@ const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;
     position: relative;
     line-height: 0;
     background: #000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
   }
 
   .video-element {
     width: 100%;
     height: auto;
     display: block;
+    cursor: pointer;
   }
 
   .video-controls {
+    width: calc((var(--column) * 4) + (var(--gap) * 3));
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-    opacity: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    flex-wrap: wrap;
+    column-gap: 16px;
+    row-gap: 4px;
+    margin: 16px;
     transition: opacity 0.3s ease;
-  }
-
-  .video-player:hover .video-controls,
-  .video-controls.active {
-    opacity: 1;
-  }
-
-  .play-pause-btn,
-  .fullscreen-btn {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s;
-    flex-shrink: 0;
-  }
-
-  .play-pause-btn:hover,
-  .fullscreen-btn:hover {
-    opacity: 0.7;
+    color: #FAF7F4;
   }
 
   .progress-container {
     flex: 1;
+    width: 100%;
     cursor: pointer;
-    padding: 8px 0;
+    padding: 4px 0;
+    grid-column: span 4;
   }
 
   .progress-bar {
     width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
+    height: 1px;
+    border-radius: 1px;
     position: relative;
     overflow: hidden;
   }
 
+  .progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-image: radial-gradient(circle, #FAF7F480 0.5px, rgba(255,255,255,0) 0.5px);
+    background-position: 0 center;
+    background-size: 3px 1px;
+    background-repeat: repeat-x;
+    transition: opacity .2s ease;
+  }
+
   .progress-filled {
     height: 100%;
-    background: white;
+    background: #FAF7F4;
     width: 0%;
-    transition: width 0.1s linear;
+    transition: width .3s linear;
   }
 
-  .time-display {
-    color: white;
-    font-size: 14px;
-    font-family: var(--font-sans, sans-serif);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .time-separator {
-    margin: 0 4px;
-  }
-
-  @media (max-width: 768px) {
-    .video-player-wrapper {
-      margin-bottom: 64px;
-    }
-
-    .video-controls {
-      gap: 8px;
-      padding: 12px;
-    }
-
-    .time-display {
-      font-size: 12px;
-    }
+  .fullscreen-btn {
+    grid-column: span 2;
+    margin: 0 0 0 auto;
   }
 </style>
 
