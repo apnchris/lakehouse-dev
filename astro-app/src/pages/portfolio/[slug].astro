@@ -234,8 +234,7 @@ const company = await sanityClient.fetch(
           <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
             {company.investmentStage && (
               <span class="sans uppercase">
-                {company.investmentStage}
-                <span class="hide-desktop">, {formatShortDate(company.investmentDate)}</span>
+                {company.investmentStage}<span class="hide-desktop">, {formatShortDate(company.investmentDate)}</span>
               </span>
             )}
 
@@ -374,17 +373,127 @@ const company = await sanityClient.fetch(
 </style>
 
 <script>
-  const headerLogo = document.querySelector('.header-logo');
-  const threshold = window.innerHeight; // 100dvh
-
-  function handleScroll() {
-    if (window.scrollY > threshold - 26) {
-      headerLogo?.classList.add('black');
-    } else {
-      headerLogo?.classList.remove('black');
+  function initializePortfolio() {
+    // Sorting functionality
+    const sorts = document.querySelectorAll<HTMLElement>('.portfolio-sort');
+    const listContainer = document.querySelector<HTMLElement>('.portfolio-list');
+    
+    if (sorts.length === 0 || !listContainer) return;
+    
+    // Remove existing event listeners by cloning elements
+    sorts.forEach((sort: HTMLElement) => {
+      const newSort = sort.cloneNode(true) as HTMLElement;
+      sort.parentNode?.replaceChild(newSort, sort);
+    });
+    
+    // Get fresh references after cloning
+    const freshSorts = document.querySelectorAll<HTMLElement>('.portfolio-sort');
+    
+    freshSorts.forEach((sort: HTMLElement) => {
+      sort.addEventListener('click', () => {
+        const sortType = sort.getAttribute('data-sort');
+        
+        // Get fresh company items on each sort
+        const companyItems = Array.from(document.querySelectorAll<HTMLElement>('.company-list-item'));
+        
+        const companiesData = companyItems.map((item: HTMLElement) => {
+          const name = item.querySelector('.company-name')?.textContent?.trim() || '';
+          const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
+          return {
+            element: item,
+            name: name,
+            date: dateText ? new Date(dateText) : new Date(0)
+          };
+        });
+        
+        // Update active state
+        freshSorts.forEach((s: HTMLElement) => s.classList.remove('active'));
+        sort.classList.add('active');
+        
+        // Sort the data
+        let sortedData = [...companiesData];
+        
+        if (sortType === 'az') {
+          sortedData.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortType === 'oldest') {
+          sortedData.sort((a, b) => a.date.getTime() - b.date.getTime());
+        } else if (sortType === 'newest') {
+          sortedData.sort((a, b) => b.date.getTime() - a.date.getTime());
+        }
+        
+        // Reorder DOM elements
+        const header = listContainer.querySelector<HTMLElement>('.portfolio-list-header');
+        sortedData.forEach(data => {
+          listContainer.appendChild(data.element);
+        });
+        
+        // Keep header at the top
+        if (header) {
+          listContainer.insertBefore(header, listContainer.firstChild);
+        }
+      });
+    });
+    
+    // Set default active sort (A-Z)
+    const azSort = document.querySelector<HTMLElement>('[data-sort="az"]');
+    if (azSort) {
+      azSort.classList.add('active');
     }
   }
 
-  window.addEventListener('scroll', handleScroll);
-  handleScroll(); // Check initial state
+  // Initialize based on document state
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePortfolio);
+  } else {
+    // DOM is already ready
+    initializePortfolio();
+  }
+  
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', initializePortfolio);
+
+  function initializeHeaderScroll() {
+    const headerLogo = document.querySelector<HTMLElement>('.header-logo');
+    const mainElement = document.querySelector<HTMLElement>('main');
+    const windowThreshold = window.innerHeight; // 100dvh for window scroll
+    const mainThreshold = window.innerHeight / 2; // 50dvh for main scroll
+
+    function handleScroll(event?: Event) {
+      let scrollPosition: number;
+      let threshold: number;
+      
+      // Check if scroll came from main element
+      if (event?.target === mainElement && mainElement) {
+        scrollPosition = mainElement.scrollTop;
+        threshold = mainThreshold;
+      } else {
+        scrollPosition = window.scrollY;
+        threshold = windowThreshold;
+      }
+      
+      if (scrollPosition > threshold - 26) {
+        headerLogo?.classList.add('black');
+      } else {
+        headerLogo?.classList.remove('black');
+      }
+    }
+
+    // Listen to both window and main element scroll
+    window.addEventListener('scroll', handleScroll);
+    if (mainElement) {
+      mainElement.addEventListener('scroll', handleScroll);
+    }
+    
+    handleScroll(); // Check initial state
+  }
+
+  // Initialize based on document state
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHeaderScroll);
+  } else {
+    initializeHeaderScroll();
+  }
+  
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', initializeHeaderScroll);
 </script>

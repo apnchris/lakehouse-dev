@@ -259,6 +259,11 @@ header nav menu.regular-grid {
   display: contents;
 }
 
+main {
+  height: 100dvh;
+  overflow-y: scroll;
+}
+
 footer {
   display: none;
 }
@@ -395,5 +400,14 @@ html[data-bg-color="green"] body:not([data-page="home"])::after {
 
 .portfolio-list .company-image img {
   height: 38px!important;
+}
+
+.header-logo svg {
+  width: 58px;
+}
+
+.header-logo a {
+  line-height: 0;
+  display: block;
 }
 }

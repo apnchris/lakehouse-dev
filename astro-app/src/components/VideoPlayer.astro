@@ -25,6 +25,7 @@ const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;
           class="video-element"
           poster={posterSrc}
           playsinline
+          webkit-playsinline
           preload="metadata"
         >
           <source src={videoSrc} type="video/mp4" />
@@ -207,12 +208,60 @@ const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;
 
     // Toggle fullscreen
     function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        player.requestFullscreen().catch(err => {
-          console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-      } else {
+      try {
+        // Check if already in fullscreen - if so, just exit
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+          exitFullscreen();
+          return;
+        }
+
+        // If video is paused, play it first then enter fullscreen
+        if (video.paused) {
+          video.play().then(() => {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            // Give it a moment to start playing
+            setTimeout(() => enterFullscreen(), 100);
+          }).catch(err => {
+            console.error('Play error:', err);
+          });
+        } else {
+          // Video is already playing, just enter fullscreen
+          enterFullscreen();
+        }
+      } catch (err) {
+        console.error('Fullscreen error:', err);
+      }
+    }
+
+    function exitFullscreen() {
+      if (document.exitFullscreen) {
         document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      }
+    }
+
+    function enterFullscreen() {
+      // iOS Safari - use webkit methods
+      if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+        return;
+      }
+      
+      // Standard fullscreen API
+      const elementToFullscreen = player;
+      
+      if (elementToFullscreen.requestFullscreen) {
+        elementToFullscreen.requestFullscreen();
+      } else if (elementToFullscreen.webkitRequestFullscreen) {
+        elementToFullscreen.webkitRequestFullscreen();
+      } else if (elementToFullscreen.mozRequestFullScreen) {
+        elementToFullscreen.mozRequestFullScreen();
+      } else if (elementToFullscreen.msRequestFullscreen) {
+        elementToFullscreen.msRequestFullscreen();
       }
     }
 
