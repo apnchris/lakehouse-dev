@@ -120,7 +120,17 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
   function initializeHomepage() {
     const trigger = document.querySelector<HTMLElement>('.read-more-trigger');
     const heroText = document.querySelector<HTMLElement>('.hero-text');
+    const video = document.querySelector<HTMLVideoElement>('.video-container video');
     
+    // Initialize video autoplay
+    if (video) {
+      video.muted = true; // Ensure muted for autoplay
+      video.play().catch(err => {
+        console.log('Video autoplay failed:', err);
+      });
+    }
+    
+    // Initialize read more trigger
     if (!trigger || !heroText) return;
     
     // Remove existing event listener by cloning

@@ -231,7 +231,7 @@ const company = await sanityClient.fetch(
         </div>
       
         {portfolio.companies.map((company: any) => (
-          <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
+          <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid" data-date={company.investmentDate || ''}>
             {company.investmentStage && (
               <span class="sans uppercase">
                 {company.investmentStage}<span class="hide-desktop">, {formatShortDate(company.investmentDate)}</span>
@@ -398,11 +398,11 @@ const company = await sanityClient.fetch(
         
         const companiesData = companyItems.map((item: HTMLElement) => {
           const name = item.querySelector('.company-name')?.textContent?.trim() || '';
-          const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
+          const dateStr = item.getAttribute('data-date') || '';
           return {
             element: item,
             name: name,
-            date: dateText ? new Date(dateText) : new Date(0)
+            date: dateStr ? new Date(dateStr) : new Date(0)
           };
         });
         
@@ -434,10 +434,10 @@ const company = await sanityClient.fetch(
       });
     });
     
-    // Set default active sort (A-Z)
+    // Set default active sort (A-Z) by triggering click
     const azSort = document.querySelector<HTMLElement>('[data-sort="az"]');
     if (azSort) {
-      azSort.classList.add('active');
+      azSort.click();
     }
   }
 
