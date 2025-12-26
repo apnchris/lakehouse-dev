@@ -11,13 +11,14 @@ import '../styles/main.css';
 interface Props {
   title: string;
   pageSlug?: string;
+  backgroundColor?: string;
 }
 
-const { title, pageSlug } = Astro.props;
+const { title, pageSlug, backgroundColor } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bg-color={backgroundColor || 'white'}>
   <head>
     <meta charset="UTF-8" />
     <meta

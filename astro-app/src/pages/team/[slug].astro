@@ -205,12 +205,12 @@ const member = await sanityClient.fetch(
     }
 
     .member-background-focus {
-      row-gap: 36px;
+      row-gap: 31px;
     }
 
     .member-name-position {
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
       left: calc(50vw - var(--column) / 2);
     }
 
@@ -226,27 +226,43 @@ const member = await sanityClient.fetch(
 </style>
 
 <script>
-  const triggers = document.querySelectorAll('.background-focus-triggers button');
-  
-  triggers.forEach(trigger => {
-    trigger.addEventListener('click', () => {
-      const targetId = trigger.getAttribute('data-target');
-      const targetSection = document.getElementById(targetId);
-      
-      // Remove active class from all triggers and hide all sections
-      triggers.forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
+  function initializeMemberPage() {
+    const triggers = document.querySelectorAll('.background-focus-triggers button');
+    
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const targetId = trigger.getAttribute('data-target');
+        const targetSection = document.getElementById(targetId);
+        
+        // Remove active class from all triggers and hide all sections
+        triggers.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.content-section').forEach(section => {
+          section.classList.remove('active');
+        });
+        
+        // Add active class to clicked trigger and show target section
+        trigger.classList.add('active');
+        targetSection?.classList.add('active');
       });
-      
-      // Add active class to clicked trigger and show target section
-      trigger.classList.add('active');
-      targetSection?.classList.add('active');
     });
-  });
 
-  // Activate first button by default
-  if (triggers.length > 0) {
-    triggers[0].click();
+    // Activate first button by default
+    if (triggers.length > 0) {
+      triggers[0].click();
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initializeMemberPage);
+  
+  // Initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initializeMemberPage);
+  
+  // Also run immediately in case DOM is already loaded
+  if (document.readyState === 'loading') {
+    // Do nothing, DOMContentLoaded will fire
+  } else {
+    // DOM is already ready
+    initializeMemberPage();
   }
 </script>

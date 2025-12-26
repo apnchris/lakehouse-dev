@@ -26,11 +26,19 @@ function formatDate(dateString: string) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
 }
 
+function formatShortDate(dateString: string) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}
+
 const companyCount = portfolio?.companies?.length || 0;
 const formattedCount = companyCount.toString().padStart(2, '0');
 ---
 
 <Layout title="Portfolio" pageSlug="portfolio">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  
   <section class="portfolio-section regular-grid">    
     {portfolio?.portfolioText && (
       <div class="portfolio-text">
@@ -39,26 +47,30 @@ const formattedCount = companyCount.toString().padStart(2, '0');
     )}
 
     {portfolio?.companies && portfolio.companies.length > 0 && (
-      <div class="portfolio-grid">
-        {portfolio.companies.map((company: any) => (
-          <div class="company-card">
-            <a href={`/portfolio/${company.slug.current}`} class="company-image">
-              {company.thumbnailImage && (
-                <img 
-                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
-                  alt={company.thumbnailImage.alt || company.name}
-                />
-              )}
-            </a>
-            
-            <div class="company-name-info">
-              <h2>{company.name}</h2>
-              {company.investmentStage && (
-                <span class="sans uppercase">{company.investmentStage}</span>
-              )}
-            </div>
+      <div class="portfolio-grid-wrapper">
+        <div class="portfolio-grid swiper">
+          <div class="swiper-wrapper">
+            {portfolio.companies.map((company: any) => (
+              <div class="company-card swiper-slide">
+                <a href={`/portfolio/${company.slug.current}`} class="company-image">
+                  {company.thumbnailImage && (
+                    <img 
+                      src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                      alt={company.thumbnailImage.alt || company.name}
+                    />
+                  )}
+                </a>
+                
+                <div class="company-name-info">
+                  <h2>{company.name}</h2>
+                  {company.investmentStage && (
+                    <span class="sans uppercase">{company.investmentStage}</span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     )}
 
@@ -77,7 +89,10 @@ const formattedCount = companyCount.toString().padStart(2, '0');
         {portfolio.companies.map((company: any) => (
           <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
             {company.investmentStage && (
-              <span class="sans uppercase">{company.investmentStage}</span>
+              <span class="sans uppercase">
+                {company.investmentStage}
+                <span class="hide-desktop">, {formatShortDate(company.investmentDate)}</span>
+              </span>
             )}
 
             <div class="company-name-info">
@@ -98,7 +113,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
             )}
 
             {company.investmentDate && (
-              <div class="company-date">
+              <div class="company-date hide-mobile">
                 {formatDate(company.investmentDate)}
               </div>
             )}
@@ -123,8 +138,11 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 
   /* Grid */
 
-  .portfolio-grid {
+  .portfolio-grid-wrapper {
     grid-column: span 9;
+  }
+
+  .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: var(--gap);
@@ -144,6 +162,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
   .portfolio-grid .company-image {
     width: 100%;
     overflow: hidden;
+    line-height: 0;
   }
 
   .company-image img {
@@ -156,62 +175,151 @@ const formattedCount = companyCount.toString().padStart(2, '0');
     display: flex;
     gap: 8px;
   }
+
+  @media screen and (min-width: 820px) {
+    .swiper-wrapper {
+      display: contents;
+    }
+  }
+
+  @media screen and (max-width: 820px) {
+    .portfolio-section {
+      grid-template-columns: 1fr;
+      padding-top: 63px;
+      gap: 72px;
+    }
+    
+    .portfolio-text,
+    .portfolio-list,
+    .portfolio-grid-wrapper {
+      grid-column: span 1;
+    }
+
+    .portfolio-grid-wrapper {
+      margin-left: calc(var(--gap) * -1);
+      margin-right: calc(var(--gap) * -1);
+      width: 100vw;
+    }
+
+    .portfolio-grid {
+      display: block;
+      grid-template-columns: none;
+    }
+
+    .portfolio-grid .swiper-wrapper {
+      display: flex;
+    }
+
+    .portfolio-grid .swiper-slide {
+      width: auto;
+    }
+
+    .company-image img {
+      height: calc((var(--column) * 6) + (var(--gap) * 6));
+    }
+  }
 </style>
 
 <script>
-  const sorts = document.querySelectorAll('.portfolio-sort');
-  const listContainer = document.querySelector('.portfolio-list');
-  
-  if (sorts && listContainer) {
-    // Store original company data for sorting
-    const companyItems = Array.from(document.querySelectorAll('.company-list-item'));
-    
-    const companiesData = companyItems.map(item => {
-      const name = item.querySelector('.company-name')?.textContent?.trim() || '';
-      const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
-      return {
-        element: item,
-        name: name,
-        date: dateText ? new Date(dateText) : new Date(0)
-      };
-    });
+  import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs';
 
-    sorts.forEach(sort => {
-      sort.addEventListener('click', () => {
-        const sortType = sort.getAttribute('data-sort');
-        
-        // Update active state
-        sorts.forEach(s => s.classList.remove('active'));
-        sort.classList.add('active');
-        
-        // Sort the data
-        let sortedData = [...companiesData];
-        
-        if (sortType === 'az') {
-          sortedData.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (sortType === 'oldest') {
-          sortedData.sort((a, b) => a.date.getTime() - b.date.getTime());
-        } else if (sortType === 'newest') {
-          sortedData.sort((a, b) => b.date.getTime() - a.date.getTime());
-        }
-        
-        // Reorder DOM elements
-        const header = listContainer.querySelector('.portfolio-list-header');
-        sortedData.forEach(data => {
-          listContainer.appendChild(data.element);
-        });
-        
-        // Keep header at the top
-        if (header) {
-          listContainer.insertBefore(header, listContainer.firstChild);
-        }
-      });
-    });
+  function initializePortfolio() {
+    // Initialize Swiper only on mobile
+    let portfolioSwiper = null;
     
-    // Set default active sort (A-Z)
-    const azSort = document.querySelector('[data-sort="az"]');
-    if (azSort) {
-      azSort.classList.add('active');
+    function handleSwiper() {
+      if (window.innerWidth <= 820) {
+        if (!portfolioSwiper) {
+          portfolioSwiper = new Swiper('.portfolio-grid', {
+            slidesPerView: 2,
+            centeredSlides: true,
+            loop: true,
+            spaceBetween: 12,
+          });
+        }
+      } else {
+        if (portfolioSwiper) {
+          portfolioSwiper.destroy(true, true);
+          portfolioSwiper = null;
+        }
+      }
     }
+    
+    // Initialize on load
+    handleSwiper();
+    
+    // Reinitialize on resize
+    window.addEventListener('resize', handleSwiper);
+
+    // Sorting functionality
+    const sorts = document.querySelectorAll('.portfolio-sort');
+    const listContainer = document.querySelector('.portfolio-list');
+    
+    if (sorts && listContainer) {
+      // Store original company data for sorting
+      const companyItems = Array.from(document.querySelectorAll('.company-list-item'));
+      
+      const companiesData = companyItems.map(item => {
+        const name = item.querySelector('.company-name')?.textContent?.trim() || '';
+        const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
+        return {
+          element: item,
+          name: name,
+          date: dateText ? new Date(dateText) : new Date(0)
+        };
+      });
+
+      sorts.forEach(sort => {
+        sort.addEventListener('click', () => {
+          const sortType = sort.getAttribute('data-sort');
+          
+          // Update active state
+          sorts.forEach(s => s.classList.remove('active'));
+          sort.classList.add('active');
+          
+          // Sort the data
+          let sortedData = [...companiesData];
+          
+          if (sortType === 'az') {
+            sortedData.sort((a, b) => a.name.localeCompare(b.name));
+          } else if (sortType === 'oldest') {
+            sortedData.sort((a, b) => a.date.getTime() - b.date.getTime());
+          } else if (sortType === 'newest') {
+            sortedData.sort((a, b) => b.date.getTime() - a.date.getTime());
+          }
+          
+          // Reorder DOM elements
+          const header = listContainer.querySelector('.portfolio-list-header');
+          sortedData.forEach(data => {
+            listContainer.appendChild(data.element);
+          });
+          
+          // Keep header at the top
+          if (header) {
+            listContainer.insertBefore(header, listContainer.firstChild);
+          }
+        });
+      });
+      
+      // Set default active sort (A-Z)
+      const azSort = document.querySelector('[data-sort="az"]');
+      if (azSort) {
+        azSort.classList.add('active');
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initializePortfolio);
+  
+  // Initialize on Astro page transitions
+  document.addEventListener('astro:page-load', initializePortfolio);
+  
+  // Also run immediately in case DOM is already loaded
+  if (document.readyState === 'loading') {
+    // Do nothing, DOMContentLoaded will fire
+  } else {
+    // DOM is already ready
+    initializePortfolio();
   }
 </script>

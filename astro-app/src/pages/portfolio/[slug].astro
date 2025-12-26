@@ -33,6 +33,12 @@ function formatDate(dateString: string) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
 }
 
+function formatShortDate(dateString: string) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}
+
 const companyCount = portfolio?.companies?.length || 0;
 const formattedCount = companyCount.toString().padStart(2, '0');
 
@@ -60,6 +66,7 @@ const company = await sanityClient.fetch(
     shortDescription,
     thumbnailImage,
     mainImage,
+    backgroundColor,
     investmentStage,
     investmentDate,
     location,
@@ -129,7 +136,7 @@ const company = await sanityClient.fetch(
 );
 ---
 
-<Layout title={company.name} pageSlug="company">
+<Layout title={company.name} pageSlug="company" backgroundColor={company.backgroundColor}>
   <section class="company-page">
     <div class="company-main-content regular-grid">
       {company.mainImage && (
@@ -226,7 +233,10 @@ const company = await sanityClient.fetch(
         {portfolio.companies.map((company: any) => (
           <a href={`/portfolio/${company.slug.current}`} class="company-list-item top-border regular-grid">
             {company.investmentStage && (
-              <span class="sans uppercase">{company.investmentStage}</span>
+              <span class="sans uppercase">
+                {company.investmentStage}
+                <span class="hide-desktop">, {formatShortDate(company.investmentDate)}</span>
+              </span>
             )}
 
             <div class="company-name-info">
@@ -247,7 +257,7 @@ const company = await sanityClient.fetch(
             )}
 
             {company.investmentDate && (
-              <div class="company-date">
+              <div class="company-date hide-mobile">
                 {formatDate(company.investmentDate)}
               </div>
             )}

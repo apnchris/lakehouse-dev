@@ -96,6 +96,20 @@ export default defineType({
       }],
     }),
     defineField({
+      name: 'backgroundColor',
+      title: 'Background Color',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'White', value: 'white'},
+          {title: 'Blue', value: 'blue'},
+          {title: 'Green', value: 'green'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'white',
+    }),
+    defineField({
       name: 'content',
       title: 'Content',
       type: 'array',

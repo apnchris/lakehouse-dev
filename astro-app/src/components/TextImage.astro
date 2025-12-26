@@ -53,4 +53,23 @@ const { text, mainImage } = Astro.props;
     display: flex;
     align-items: center;
   }
+
+  @media screen and (max-width: 820px) {
+    .text-image {
+      grid-template-columns: 1fr;
+      padding: 0 var(--gap);
+      margin-bottom: 72px;
+      row-gap: 72px;
+    }
+
+    .text-image-visual {
+      grid-column: 1;
+      width: calc((var(--column) * 8) + (var(--gap) * 7));
+      margin: 0 auto;
+    }
+
+    .text-image-content {
+      grid-column: 1;
+    }
+  }
 </style>

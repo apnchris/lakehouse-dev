@@ -96,4 +96,38 @@ const { profiles, text } = Astro.props;
     flex-direction: column;
     gap: 5px;
   }
+
+  @media screen and (max-width: 820px) {
+    .profiles-grid,
+    .text-profiles {
+      grid-template-columns: 1fr;
+      grid-column: span 1;
+    }
+
+    .profiles-grid {
+      gap: 36px;
+    }
+
+    .text-profiles {
+      gap: 72px;
+      margin-bottom: 72px;
+    }
+    
+    .profiles-background {
+      grid-column: span 1;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--gap);
+    }
+
+    .profile-infos {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+      justify-content: space-between;
+    }
+  }
 </style>
