@@ -227,42 +227,48 @@ const member = await sanityClient.fetch(
 
 <script>
   function initializeMemberPage() {
-    const triggers = document.querySelectorAll('.background-focus-triggers button');
+    const triggers = document.querySelectorAll<HTMLButtonElement>('.background-focus-triggers button');
     
-    triggers.forEach(trigger => {
+    triggers.forEach((trigger: HTMLButtonElement) => {
       trigger.addEventListener('click', () => {
         const targetId = trigger.getAttribute('data-target');
+        
+        // Guard against null targetId
+        if (!targetId) return;
+        
         const targetSection = document.getElementById(targetId);
         
         // Remove active class from all triggers and hide all sections
-        triggers.forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.content-section').forEach(section => {
+        triggers.forEach((t: HTMLButtonElement) => t.classList.remove('active'));
+        document.querySelectorAll<HTMLElement>('.content-section').forEach((section: HTMLElement) => {
           section.classList.remove('active');
         });
         
         // Add active class to clicked trigger and show target section
         trigger.classList.add('active');
-        targetSection?.classList.add('active');
+        if (targetSection) {
+          targetSection.classList.add('active');
+        }
       });
     });
 
     // Activate first button by default
     if (triggers.length > 0) {
-      triggers[0].click();
+      const firstTrigger = triggers[0];
+      if (firstTrigger) {
+        firstTrigger.click();
+      }
     }
   }
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', initializeMemberPage);
-  
-  // Initialize on Astro page transitions
-  document.addEventListener('astro:page-load', initializeMemberPage);
-  
-  // Also run immediately in case DOM is already loaded
+  // Initialize based on document state
   if (document.readyState === 'loading') {
-    // Do nothing, DOMContentLoaded will fire
+    document.addEventListener('DOMContentLoaded', initializeMemberPage);
   } else {
     // DOM is already ready
     initializeMemberPage();
   }
+  
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', initializeMemberPage);
 </script>
