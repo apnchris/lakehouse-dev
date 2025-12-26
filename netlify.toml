@@ -1,0 +1,6 @@
+[build]
+  command = "npm --workspace astro-app run build"
+  publish = "astro-app/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
