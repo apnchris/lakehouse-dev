@@ -1,5 +1,6 @@
 [build]
-  command = "npm --workspace astro-app run build"
+  base = "astro-app"
+  command = "npm run build"
   publish = "astro-app/dist"
 
 [build.environment]
