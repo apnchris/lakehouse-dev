@@ -117,12 +117,29 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
 </style>
 
 <script>
-  const trigger = document.querySelector('.read-more-trigger');
-  const heroText = document.querySelector('.hero-text');
-  
-  if (trigger && heroText) {
-    trigger.addEventListener('click', () => {
+  function initializeHomepage() {
+    const trigger = document.querySelector<HTMLElement>('.read-more-trigger');
+    const heroText = document.querySelector<HTMLElement>('.hero-text');
+    
+    if (!trigger || !heroText) return;
+    
+    // Remove existing event listener by cloning
+    const newTrigger = trigger.cloneNode(true) as HTMLElement;
+    trigger.parentNode?.replaceChild(newTrigger, trigger);
+    
+    // Add event listener to the new element
+    newTrigger.addEventListener('click', () => {
       heroText.classList.toggle('show');
     });
   }
+
+  // Initialize based on document state
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHomepage);
+  } else {
+    initializeHomepage();
+  }
+  
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', initializeHomepage);
 </script>

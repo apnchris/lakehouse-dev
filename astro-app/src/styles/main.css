@@ -270,15 +270,16 @@ footer {
 
 .header-logo {
   position: fixed;
-  padding: var(--gap);
-  top: 0;
-  left: 0;
+  padding: 0;
+  top: var(--gap);
+  left: var(--gap);
   z-index: 100;
 }
 
 .header-links {
   position: fixed;
   padding: var(--gap);
+  gap: 5px;
   bottom: 0;
   left: 0;
   z-index: 100;
