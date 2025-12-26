@@ -38,6 +38,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 
 <Layout title="Portfolio" pageSlug="portfolio">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" is:inline></script>
   
   <section class="portfolio-section regular-grid">    
     {portfolio?.portfolioText && (
@@ -221,16 +222,28 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 </style>
 
 <script>
-  import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs';
+  // Declare Swiper type for TypeScript
+  declare global {
+    interface Window {
+      Swiper: any;
+    }
+  }
 
   function initializePortfolio() {
     // Initialize Swiper only on mobile
-    let portfolioSwiper = null;
+    let portfolioSwiper: any = null;
+    let resizeTimeout: number | null = null;
     
     function handleSwiper() {
       if (window.innerWidth <= 820) {
         if (!portfolioSwiper) {
-          portfolioSwiper = new Swiper('.portfolio-grid', {
+          // Check if Swiper is available
+          if (typeof window.Swiper === 'undefined') {
+            console.error('Swiper is not loaded');
+            return;
+          }
+          
+          portfolioSwiper = new window.Swiper('.portfolio-grid', {
             slidesPerView: 2,
             centeredSlides: true,
             loop: true,
@@ -248,18 +261,23 @@ const formattedCount = companyCount.toString().padStart(2, '0');
     // Initialize on load
     handleSwiper();
     
-    // Reinitialize on resize
-    window.addEventListener('resize', handleSwiper);
+    // Debounced resize handler
+    window.addEventListener('resize', () => {
+      if (resizeTimeout !== null) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = window.setTimeout(handleSwiper, 250);
+    });
 
     // Sorting functionality
-    const sorts = document.querySelectorAll('.portfolio-sort');
-    const listContainer = document.querySelector('.portfolio-list');
+    const sorts = document.querySelectorAll<HTMLElement>('.portfolio-sort');
+    const listContainer = document.querySelector<HTMLElement>('.portfolio-list');
     
     if (sorts && listContainer) {
       // Store original company data for sorting
-      const companyItems = Array.from(document.querySelectorAll('.company-list-item'));
+      const companyItems = Array.from(document.querySelectorAll<HTMLElement>('.company-list-item'));
       
-      const companiesData = companyItems.map(item => {
+      const companiesData = companyItems.map((item: HTMLElement) => {
         const name = item.querySelector('.company-name')?.textContent?.trim() || '';
         const dateText = item.querySelector('.company-date')?.textContent?.trim() || '';
         return {
@@ -269,12 +287,12 @@ const formattedCount = companyCount.toString().padStart(2, '0');
         };
       });
 
-      sorts.forEach(sort => {
+      sorts.forEach((sort: HTMLElement) => {
         sort.addEventListener('click', () => {
           const sortType = sort.getAttribute('data-sort');
           
           // Update active state
-          sorts.forEach(s => s.classList.remove('active'));
+          sorts.forEach((s: HTMLElement) => s.classList.remove('active'));
           sort.classList.add('active');
           
           // Sort the data
@@ -289,7 +307,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
           }
           
           // Reorder DOM elements
-          const header = listContainer.querySelector('.portfolio-list-header');
+          const header = listContainer.querySelector<HTMLElement>('.portfolio-list-header');
           sortedData.forEach(data => {
             listContainer.appendChild(data.element);
           });
@@ -302,24 +320,21 @@ const formattedCount = companyCount.toString().padStart(2, '0');
       });
       
       // Set default active sort (A-Z)
-      const azSort = document.querySelector('[data-sort="az"]');
+      const azSort = document.querySelector<HTMLElement>('[data-sort="az"]');
       if (azSort) {
         azSort.classList.add('active');
       }
     }
   }
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', initializePortfolio);
-  
-  // Initialize on Astro page transitions
-  document.addEventListener('astro:page-load', initializePortfolio);
-  
-  // Also run immediately in case DOM is already loaded
+  // Initialize based on document state
   if (document.readyState === 'loading') {
-    // Do nothing, DOMContentLoaded will fire
+    document.addEventListener('DOMContentLoaded', initializePortfolio);
   } else {
     // DOM is already ready
     initializePortfolio();
   }
+  
+  // Handle Astro page transitions
+  document.addEventListener('astro:page-load', initializePortfolio);
 </script>

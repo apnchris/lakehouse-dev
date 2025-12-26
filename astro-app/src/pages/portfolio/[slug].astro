@@ -199,19 +199,19 @@ const company = await sanityClient.fetch(
       <div class="company-content">
         {company.content.map((block: any) => {
           if (block._type === 'textProfiles') {
-            return <TextProfiles profiles={block.profiles} text={block.text} key={block._key} />;
+            return <TextProfiles profiles={block.profiles} text={block.text} />;
           }
           if (block._type === 'textImage') {
-            return <TextImage text={block.text} mainImage={block.mainImage} key={block._key} />;
+            return <TextImage text={block.text} mainImage={block.mainImage} />;
           }
           if (block._type === 'relatedCompanies') {
-            return <RelatedCompanies relatedCompanies={block.relatedCompanies} key={block._key} />;
+            return <RelatedCompanies relatedCompanies={block.relatedCompanies} />;
           }
           if (block._type === 'fullscreenImage') {
-            return <FullscreenImage mainImage={block.mainImage} key={block._key} />;
+            return <FullscreenImage mainImage={block.mainImage} />;
           }
           if (block._type === 'videoPlayer') {
-            return <VideoPlayer videoPoster={block.videoPoster} videoFile={block.videoFile} videoCdn={block.videoCdn} key={block._key} />;
+            return <VideoPlayer videoPoster={block.videoPoster} videoFile={block.videoFile} videoCdn={block.videoCdn} />;
           }
           return null;
         })}
