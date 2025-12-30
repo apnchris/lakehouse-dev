@@ -86,7 +86,12 @@ const company = await sanityClient.fetch(
           name,
           position,
           background,
-          mainImage
+          mainImage,
+          member->{
+            _id,
+            name,
+            slug
+          }
         }
       },
       _type == "textImage" => {
@@ -369,6 +374,11 @@ const company = await sanityClient.fetch(
       width: calc(100vw - (var(--gap) * 2));
       gap: 72px;
     }    
+
+    .detail-label,
+    .detail-value {
+      grid-column: span 2;
+    }
   }
 </style>
 

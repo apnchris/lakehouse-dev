@@ -25,7 +25,7 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
         <h1>Lakehouse</h1> <span>{homepage.aboutShort}</span>
       )}
       {homepage?.aboutText && (
-        <span class="read-more-trigger sans uppercase">Read more</span>
+        <span class="read-more-trigger back-hover sans uppercase">Read more</span>
         <span class="about-text">{homepage.aboutText}</span>
       )}
     </div>
@@ -82,6 +82,7 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
     transition: opacity .2s ease;
     pointer-events: auto;
     white-space: nowrap;
+    margin-left: 4px;
   }
 
   .hero-text.show .read-more-trigger {

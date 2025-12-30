@@ -62,12 +62,12 @@ const member = await sanityClient.fetch(
       <div class="member-section member-background-focus top-border">
         <div class="background-focus-triggers">
           {member.background && (
-            <button data-target="background-section" class="member-content-trigger sans uppercase">
+            <button data-target="background-section" class="member-content-trigger back-hover sans uppercase">
               Background{member.focus && (',')}
             </button>
           )}
           {member.focus && (
-            <button data-target="focus-section" class="member-content-trigger sans uppercase">
+            <button data-target="focus-section" class="member-content-trigger back-hover sans uppercase">
               Focus
             </button>
           )}

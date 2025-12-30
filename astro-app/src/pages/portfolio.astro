@@ -41,39 +41,44 @@ const formattedCount = companyCount.toString().padStart(2, '0');
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" is:inline></script>
   
   <section class="portfolio-section regular-grid">    
-    {portfolio?.portfolioText && (
-      <div class="portfolio-text">
-        <p>{portfolio.portfolioText}</p>
-      </div>
-    )}
+    <div class="portfolio-main-content regular-grid">
+      {portfolio?.portfolioText && (
+        <div class="portfolio-text">
+          <p>{portfolio.portfolioText}</p>
+        </div>
+      )}
 
-    {portfolio?.companies && portfolio.companies.length > 0 && (
-      <div class="portfolio-grid-wrapper">
-        <div class="portfolio-grid swiper">
-          <div class="swiper-wrapper">
-            {portfolio.companies.map((company: any) => (
-              <div class="company-card swiper-slide">
-                <a href={`/portfolio/${company.slug.current}`} class="company-image">
-                  {company.thumbnailImage && (
-                    <img 
-                      src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
-                      alt={company.thumbnailImage.alt || company.name}
-                    />
-                  )}
-                </a>
-                
-                <div class="company-name-info">
-                  <h2>{company.name}</h2>
-                  {company.investmentStage && (
-                    <span class="sans uppercase">{company.investmentStage}</span>
-                  )}
+      {portfolio?.companies && portfolio.companies.length > 0 && (
+        <div class="portfolio-grid-wrapper">
+          <div class="portfolio-grid swiper">
+            <div class="swiper-wrapper">
+              {portfolio.companies.map((company: any) => (
+                <div class="company-card back-hover swiper-slide">
+                  <a href={`/portfolio/${company.slug.current}`} class="company-image">
+                    {company.thumbnailImage && (
+                      <img 
+                        src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                        alt={company.thumbnailImage.alt || company.name}
+                      />
+                    )}
+                  </a>
+                  
+                  <div class="company-name-info">
+                    <h2>{company.name}</h2>
+
+                    {company.investmentStage && (
+                      <span class="sans uppercase">{company.investmentStage}</span>
+                    )}
+
+                    <span class="hover-arrow">→</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
+    </div>
 
     {portfolio?.companies && portfolio.companies.length > 0 && (      
       <div class="portfolio-list">
@@ -142,6 +147,10 @@ const formattedCount = companyCount.toString().padStart(2, '0');
     grid-column: span 9;
   }
 
+  .portfolio-main-content {
+    grid-column: span 12;
+  }
+
   .portfolio-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -151,12 +160,16 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 
   .portfolio-text {
     grid-column: span 3;
+    position: sticky;
+    top: 100px;
+    height: fit-content;
   }
 
   .company-card {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-bottom: 4px;
   }
 
   .portfolio-grid .company-image {
@@ -174,9 +187,14 @@ const formattedCount = companyCount.toString().padStart(2, '0');
   .company-name-info {
     display: flex;
     gap: 8px;
+    position: relative;
   }
 
   @media screen and (min-width: 820px) {
+    .portfolio-grid {
+      overflow: initial;
+    }
+
     .swiper-wrapper {
       display: contents;
     }
@@ -187,6 +205,15 @@ const formattedCount = companyCount.toString().padStart(2, '0');
       grid-template-columns: 1fr;
       padding-top: 63px;
       gap: 72px;
+    }
+
+    .portfolio-text {
+      position: relative;
+      top: auto;
+    }
+
+    .portfolio-main-content {
+      display: contents;
     }
     
     .portfolio-text,
@@ -216,6 +243,14 @@ const formattedCount = companyCount.toString().padStart(2, '0');
 
     .company-image img {
       height: calc((var(--column) * 6) + (var(--gap) * 6));
+    }
+
+    .company-card .company-name-info {
+      flex-direction: column-reverse;
+    }
+
+    .company-card .company-name-info .sans {
+      padding: 0;
     }
   }
 </style>

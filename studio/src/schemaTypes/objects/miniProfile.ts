@@ -38,6 +38,13 @@ export default defineType({
       type: 'text',
       rows: 2,
     },
+    {
+      name: 'member',
+      title: 'Team Member',
+      type: 'reference',
+      to: [{type: 'member'}],
+      description: 'Link to a team member profile',
+    },
   ],
   preview: {
     select: {

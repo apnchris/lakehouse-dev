@@ -7,6 +7,13 @@ interface Profile {
   position: string;
   background: string;
   mainImage?: any;
+  member?: {
+    _id: string;
+    name: string;
+    slug: {
+      current: string;
+    };
+  };
 }
 
 interface Props {
@@ -20,32 +27,45 @@ const { profiles, text } = Astro.props;
 <div class="text-profiles regular-grid">  
   {profiles && profiles.length > 0 && (
     <div class="profiles-grid">
-      {profiles.map((profile) => (
-        <div class="profile-card">
-          {profile.mainImage && (
-            <div class="profile-image">
-              <img 
-                src={urlFor(profile.mainImage).width(400).height(400).url()} 
-                alt={profile.mainImage.alt || profile.name}
-              />
-            </div>
-          )}
-          <div class="profile-infos">
-            <div class="profile-name-position">
-              <h3>{profile.name}</h3>
-              {profile.position && (
-                <span class="profile-position sans uppercase">{profile.position}</span>
-              )}
-            </div>
+      {profiles.map((profile) => {
+        const CardTag = profile.member && profile.member.slug ? 'a' : 'div';
+        const cardClass = profile.member && profile.member.slug 
+          ? 'profile-card back-hover' 
+          : 'profile-card';
+        const cardProps = profile.member && profile.member.slug 
+          ? { href: `/team/${profile.member.slug.current}` }
+          : {};
+        
+        return (
+          <CardTag class={cardClass} {...cardProps}>
+            {profile.mainImage && (
+              <div class="profile-image">
+                <img 
+                  src={urlFor(profile.mainImage).width(400).height(400).url()} 
+                  alt={profile.mainImage.alt || profile.name}
+                />
+              </div>
+            )}
+            <div class="profile-infos">
+              <div class="profile-name-position">
+                <h3>{profile.name}</h3>
 
-            <div class="profile-background">
-              {profile.background && (
-                <p class="profile-background" set:html={profile.background.replace(/\n/g, '<br>')} />
-              )}
+                {profile.position && (
+                  <span class="profile-position sans uppercase">{profile.position}</span>
+                )}
+
+                <span class="hover-arrow">→</span>
+              </div>
+
+              <div class="profile-background">
+                {profile.background && (
+                  <p class="profile-background" set:html={profile.background.replace(/\n/g, '<br>')} />
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          </CardTag>
+        );
+      })}
     </div>
   )}
 
@@ -77,6 +97,10 @@ const { profiles, text } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    height: fit-content;
+    padding-bottom: 4px;
   }
 
   .profile-image img {
@@ -95,6 +119,7 @@ const { profiles, text } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: relative;
   }
 
   @media screen and (max-width: 820px) {
