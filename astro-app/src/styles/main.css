@@ -496,7 +496,8 @@ html[data-bg-color="green"] body:not([data-page="home"])::after {
 }
 
 .header-logo svg {
-  width: 58px;
+  width: 61px;
+  transform: translateY(-0.5px);
 }
 
 .header-logo a {
