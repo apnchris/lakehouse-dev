@@ -1,10 +1,15 @@
 <footer>
   <menu class="regular-grid">
-    <li class="current-location">
+    <li class="header-element header-contact hide-desktop">
+      <a href="#" class="back-hover">Get in Touch</a>
+    </li>
+
+    <li class="current-location hide-mobile">
       New York, NY
       <span class="current-time sans uppercase"></span>
     </li>
-    <li class="current-date">
+    
+    <li class="current-date hide-mobile">
       {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
     </li>
   </menu>

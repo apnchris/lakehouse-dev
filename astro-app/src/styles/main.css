@@ -343,14 +343,14 @@ header nav menu.regular-grid {
   display: contents;
 }
 
-main {
-  height: 100dvh;
-  overflow-y: scroll;
+footer menu.regular-grid {
+  display: flex;
 }
 
-footer {
-  display: none;
-}
+/* main {
+  height: 100dvh;
+  overflow-y: scroll;
+} */
 
 .header-logo {
   position: fixed;
@@ -387,15 +387,11 @@ footer {
   position: absolute;
 }
 
-.header-contact {
-  position: fixed;
+body[data-page='home'] footer {
   padding: 9px var(--gap);
-  bottom: 0;
-  left: 0;
-  z-index: 100;
 }
 
-body:not([data-page="home"])::before {
+/* body:not([data-page="home"])::before {
   content: "";
   position: fixed;
   bottom: 43px;
@@ -441,7 +437,7 @@ html[data-bg-color="green"] body:not([data-page="home"])::before {
 
 html[data-bg-color="green"] body:not([data-page="home"])::after {
   background: #E8EFE8;
-}
+} */
 
 .related-section-header .section-title {
   grid-column: span 5;
