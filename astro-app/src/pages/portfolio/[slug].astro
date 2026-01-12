@@ -465,17 +465,17 @@ const company = await sanityClient.fetch(
   function initializeHeaderScroll() {
     const headerLogo = document.querySelector<HTMLElement>('.header-logo');
     const headerLinks = document.querySelector<HTMLElement>('.header-links');
-    const mainElement = document.querySelector<HTMLElement>('main');
     const windowThreshold = window.innerHeight; // 100dvh for window scroll
     const mainThreshold = window.innerHeight / 2; // 50dvh for main scroll
+    const ww = window.innerWidth;
 
     function handleScroll(event?: Event) {
       let scrollPosition: number;
       let threshold: number;
       
       // Check if scroll came from main element
-      if (event?.target === mainElement && mainElement) {
-        scrollPosition = mainElement.scrollTop;
+      if (ww < 821) {
+        scrollPosition = window.scrollY;
         threshold = mainThreshold;
       } else {
         scrollPosition = window.scrollY;
@@ -493,9 +493,6 @@ const company = await sanityClient.fetch(
 
     // Listen to both window and main element scroll
     window.addEventListener('scroll', handleScroll);
-    if (mainElement) {
-      mainElement.addEventListener('scroll', handleScroll);
-    }
     
     handleScroll(); // Check initial state
   }

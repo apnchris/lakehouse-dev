@@ -45,8 +45,7 @@ body[data-page='home'] {
   color: #FAF7F4;
 }
 
-body[data-page='company'] .header-logo:not(.black),
-body[data-page='company'] .header-links:not(.black) {
+body[data-page='company'] .header-logo:not(.black) {
   color: #FAF7F4;
 }
 
@@ -367,6 +366,7 @@ footer menu.regular-grid {
   top: 0;
   right: 0;
   z-index: 100;
+  transition: color .2s ease;
 }
 
 .header-links a {
@@ -385,6 +385,10 @@ footer menu.regular-grid {
 
 .header-links span {
   position: absolute;
+}
+
+body[data-page='company'] .header-links:not(.black) {
+  color: #FAF7F4;
 }
 
 body[data-page='home'] footer {
