@@ -45,7 +45,8 @@ body[data-page='home'] {
   color: #FAF7F4;
 }
 
-body[data-page='company'] .header-logo:not(.black) {
+body[data-page='company'] .header-logo:not(.black),
+body[data-page='company'] .header-links:not(.black) {
   color: #FAF7F4;
 }
 
@@ -332,8 +333,8 @@ body[data-page='home'] .back-hover::before {
 
 @media screen and (max-width: 820px) {
 body {
-  font-size: 13px;
-  line-height: 15px;
+  font-size: 15px;
+  line-height: 19px;
 }
 
 header,
@@ -361,18 +362,36 @@ footer {
 
 .header-links {
   position: fixed;
-  padding: var(--gap);
-  gap: 5px;
-  bottom: 0;
-  left: 0;
+  padding: 9px var(--gap);
+  gap: 9px;
+  top: 0;
+  right: 0;
   z-index: 100;
+}
+
+.header-links a {
+  display: block;
+  position: relative;
+}
+
+.header-links a::after {
+  content: "";
+  left: 0;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-bottom: 1px dotted currentColor;
+}
+
+.header-links span {
+  position: absolute;
 }
 
 .header-contact {
   position: fixed;
-  padding: var(--gap);
+  padding: 9px var(--gap);
   bottom: 0;
-  left: calc(50vw - var(--gap) / 2);
+  left: 0;
   z-index: 100;
 }
 
@@ -480,8 +499,8 @@ html[data-bg-color="green"] body:not([data-page="home"])::after {
 }
 
 .portfolio-list .company-image {
-  height: 39px;
-  width: 39px;
+  height: 49px;
+  width: 49px;
   opacity: 1;
   left: auto!important;
   top: auto!important;
@@ -492,12 +511,11 @@ html[data-bg-color="green"] body:not([data-page="home"])::after {
 }
 
 .portfolio-list .company-image img {
-  height: 39px!important;
+  height: 49px!important;
 }
 
 .header-logo svg {
-  width: 61px;
-  transform: translateY(-0.5px);
+  width: 80px;
 }
 
 .header-logo a {

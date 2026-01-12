@@ -12,6 +12,12 @@ export default defineType({
       rows: 2,
     }),
     defineField({
+      name: 'aboutShortMobile',
+      title: 'About Short (Mobile)',
+      type: 'text',
+      rows: 2,
+    }),
+    defineField({
       name: 'aboutText',
       title: 'About',
       type: 'text',

@@ -10,7 +10,7 @@ const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
 export default defineConfig({
   name: 'sanity-template-astro-clean',
-  title: 'Sanity Astro Starter',
+  title: 'Lakehouse',
   projectId,
   dataset,
   plugins: [structureTool({structure}), visionTool()],

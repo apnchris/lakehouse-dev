@@ -7,6 +7,7 @@ import { urlFor } from '../utils/image';
 const homepage = await sanityClient.fetch(
   groq`*[_type == "homepage"][0]{
     aboutShort,
+    aboutShortMobile,
     aboutText,
     videoPoster,
     "videoFileUrl": videoFile.asset->url,
@@ -22,7 +23,7 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
   <section class="homepage">
     <div class="hero-text">
       {homepage?.aboutShort && (
-        <h1>Lakehouse</h1> <span>{homepage.aboutShort}</span>
+        <h1>Lakehouse</h1> <span class="hide-mobile">{homepage.aboutShort}</span><span class="hide-desktop">{homepage.aboutShortMobile}</span>
       )}
       {homepage?.aboutText && (
         <span class="read-more-trigger back-hover sans uppercase">Read more</span>
@@ -108,11 +109,18 @@ const posterUrl = homepage?.videoPoster ? urlFor(homepage.videoPoster).width(192
   @media screen and (max-width: 820px) {
     .hero-text {
       width: calc(100vw - (var(--gap) * 2));
-      margin-top: 10px;
+      margin-top: 40px;
     }
 
     .hero-text h1 {
-      width: 61px;
+      display: none;
+    }
+
+    .read-more-trigger {
+      position: absolute;
+      display: block;
+      margin-left: 0;
+      margin-top: 8px;
     }
   }
 </style>

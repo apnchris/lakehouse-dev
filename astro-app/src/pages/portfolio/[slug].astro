@@ -464,6 +464,7 @@ const company = await sanityClient.fetch(
 
   function initializeHeaderScroll() {
     const headerLogo = document.querySelector<HTMLElement>('.header-logo');
+    const headerLinks = document.querySelector<HTMLElement>('.header-links');
     const mainElement = document.querySelector<HTMLElement>('main');
     const windowThreshold = window.innerHeight; // 100dvh for window scroll
     const mainThreshold = window.innerHeight / 2; // 50dvh for main scroll
@@ -483,8 +484,10 @@ const company = await sanityClient.fetch(
       
       if (scrollPosition > threshold - 26) {
         headerLogo?.classList.add('black');
+        headerLinks?.classList.add('black');
       } else {
         headerLogo?.classList.remove('black');
+        headerLinks?.classList.remove('black');
       }
     }
 
