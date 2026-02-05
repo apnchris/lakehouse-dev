@@ -6,8 +6,17 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'featuredCompanies',
+      title: 'Featured Companies',
+      type: 'array',
+      of: [{ 
+        type: 'reference',
+        to: [{ type: 'company' }]
+      }]
+    }),
+    defineField({
       name: 'companies',
-      title: 'Companies',
+      title: 'Companies List',
       type: 'array',
       of: [{ 
         type: 'reference',

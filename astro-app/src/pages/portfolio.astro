@@ -7,6 +7,16 @@ import { urlFor } from '../utils/image';
 const portfolio = await sanityClient.fetch(
   groq`*[_type == "portfolio"][0]{
     portfolioText,
+    featuredCompanies[]->{
+      _id,
+      name,
+      slug,
+      shortDescription,
+      thumbnailImage,
+      investmentStage,
+      investmentDate,
+      location
+    },
     companies[]->{
       _id,
       name,
@@ -52,7 +62,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
         <div class="portfolio-grid-wrapper">
           <div class="portfolio-grid swiper">
             <div class="swiper-wrapper">
-              {portfolio.companies.map((company: any) => (
+              {portfolio.featuredCompanies.map((company: any) => (
                 <div class="company-card back-hover swiper-slide">
                   <a href={`/portfolio/${company.slug.current}`} class="company-image">
                     {company.thumbnailImage && (

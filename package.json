@@ -1,6 +1,6 @@
 {
   "name": "lakehouse",
-  "description": "Minimal Astro site with Sanity Studio",
+  "description": "Lakehouse Ventures",
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\""
   },

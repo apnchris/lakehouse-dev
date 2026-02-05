@@ -1,5 +1,5 @@
 {
-  "name": "sanity-template-astro-clean",
+  "name": "lakehouse-ventures-studio",
   "private": true,
   "version": "1.0.0",
   "main": "package.json",
@@ -15,10 +15,10 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^5.1.0",
+    "@sanity/vision": "^5.5.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "sanity": "^5.1.0",
+    "sanity": "^5.5.0",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {
