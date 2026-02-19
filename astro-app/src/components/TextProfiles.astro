@@ -41,7 +41,7 @@ const { profiles, text } = Astro.props;
             {profile.mainImage && (
               <div class="profile-image">
                 <img 
-                  src={urlFor(profile.mainImage).width(400).height(400).url()} 
+                  src={urlFor(profile.mainImage).width(1800).height(1800).quality(100).fit('max').url()} 
                   alt={profile.mainImage.alt || profile.name}
                 />
               </div>

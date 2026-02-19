@@ -1,8 +1,16 @@
 ---
 import Logo from "./Logo.astro";
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+
+const siteSettings = await sanityClient.fetch(
+  groq`*[_type == "siteSettings"][0]{
+    getInTouchEmail
+  }`
+);
 ---
 
-<header>
+<header id="site-header" class="site-header">
   <nav>
     <menu class="regular-grid">
       <li class="header-element header-logo">
@@ -14,9 +22,93 @@ import Logo from "./Logo.astro";
         <a href="/team" class="back-hover">Team</a>
       </li>
 
-      <li class="header-element header-contact hide-mobile">
-        <a href="#" class="back-hover">Get in Touch</a>
-      </li>
+      {siteSettings?.getInTouchEmail && (
+        <li class="header-element header-contact hide-mobile">
+          <button
+            type="button"
+            class="header-contact-btn back-hover"
+            data-email={siteSettings.getInTouchEmail}
+          >
+            Get in Touch
+          </button>
+        </li>
+      )}
     </menu>
   </nav>
 </header>
+
+<script>
+  function initHeaderScroll() {
+    const header = document.getElementById('site-header') as HTMLElement | null
+    if (!header || header.dataset.scrollInit) return
+    header.dataset.scrollInit = 'true'
+
+    let lastScrollY = window.scrollY
+    const scrollThreshold = 80
+    const topThreshold = 80
+
+    function handleScroll() {
+      const el = document.getElementById('site-header')
+      if (!el) return
+      const scrollY = window.scrollY
+
+      if (scrollY <= topThreshold) {
+        el.classList.add('at-top')
+      } else {
+        el.classList.remove('at-top')
+      }
+
+      if (scrollY > scrollThreshold) {
+        if (scrollY > lastScrollY) {
+          el.classList.add('hide')
+        } else {
+          el.classList.remove('hide')
+        }
+      } else {
+        el.classList.remove('hide')
+      }
+
+      lastScrollY = scrollY
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+  }
+
+  function initContactButton() {
+    document.querySelectorAll<HTMLButtonElement>('.header-contact-btn').forEach((btn) => {
+      if (btn.dataset.initialized) return
+      btn.dataset.initialized = 'true'
+      btn.addEventListener('click', async () => {
+        const email = btn.getAttribute('data-email')
+        if (!email) return
+        try {
+          await navigator.clipboard.writeText(email)
+          const originalText = btn.textContent
+          btn.textContent = 'Email copied'
+          setTimeout(() => {
+            btn.textContent = originalText
+          }, 2000)
+        } catch {
+          window.location.href = `mailto:${email}`
+        }
+      })
+    })
+  }
+  initContactButton()
+  initHeaderScroll()
+  document.addEventListener('astro:page-load', () => {
+    initContactButton()
+    initHeaderScroll()
+  })
+</script>
+
+<style>
+  .header-contact-btn {
+    all: unset;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    position: relative;
+  }
+</style>

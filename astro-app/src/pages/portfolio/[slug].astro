@@ -10,9 +10,10 @@ import RelatedCompanies from '../../components/RelatedCompanies.astro';
 import FullscreenImage from '../../components/FullscreenImage.astro';
 import VideoPlayer from '../../components/VideoPlayer.astro';
 
-const portfolio = await sanityClient.fetch(
+const portfolioRaw = await sanityClient.fetch(
   groq`*[_type == "portfolio"][0]{
     portfolioText,
+    defaultSort,
     companies[]->{
       _id,
       name,
@@ -26,6 +27,25 @@ const portfolio = await sanityClient.fetch(
     }
   }`
 );
+
+function sortCompanies(companies: any[], sortType: string) {
+  if (!companies?.length) return companies;
+  const sorted = [...companies];
+  if (sortType === 'az') {
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sortType === 'oldest') {
+    sorted.sort((a, b) => (new Date(a.investmentDate || 0)).getTime() - (new Date(b.investmentDate || 0)).getTime());
+  } else if (sortType === 'newest') {
+    sorted.sort((a, b) => (new Date(b.investmentDate || 0)).getTime() - (new Date(a.investmentDate || 0)).getTime());
+  }
+  return sorted;
+}
+
+const defaultSort = portfolioRaw?.defaultSort || 'az';
+const portfolio = {
+  ...portfolioRaw,
+  companies: sortCompanies(portfolioRaw?.companies || [], defaultSort),
+};
 
 function formatDate(dateString: string) {
   if (!dateString) return null;
@@ -147,7 +167,7 @@ const company = await sanityClient.fetch(
       {company.mainImage && (
         <div class="company-main-image">
           <img 
-            src={urlFor(company.mainImage).width(1200).height(800).url()} 
+            src={urlFor(company.mainImage).width(3000).height(2000).quality(100).fit('max').url()} 
             alt={company.mainImage.alt || company.name}
           />
         </div>
@@ -160,18 +180,12 @@ const company = await sanityClient.fetch(
             <p>{company.description}</p>
           </div>
         )}
-        
+
         <div class="company-details">
-          {company.socialMedia && company.socialMedia.length > 0 && (
+          {company.founders && company.founders.length > 0 && (
             <div class="detail-item top-border">
-              <span class="detail-label sans uppercase">Socials</span>
-              <span class="detail-value">
-                {company.socialMedia.map((link: any, index: number) => (
-                  <a href={link.url} target="_blank" rel="noopener noreferrer" class="social-link">
-                    {link.text}{index < company.socialMedia.length - 1 && ', '}
-                  </a>
-                ))}
-              </span>
+              <span class="detail-label sans uppercase">Founders</span>
+              <span class="detail-value">{company.founders.join(', ')}</span>
             </div>
           )}
           
@@ -181,8 +195,7 @@ const company = await sanityClient.fetch(
               <span class="detail-value">{company.investmentStage}{company.investmentDate && (", " + formatDate(company.investmentDate))}</span>
             </div>
           )}
-          
-          
+
           {company.location && (
             <div class="detail-item top-border">
               <span class="detail-label sans uppercase">Location</span>
@@ -190,10 +203,16 @@ const company = await sanityClient.fetch(
             </div>
           )}
           
-          {company.founders && company.founders.length > 0 && (
+          {company.socialMedia && company.socialMedia.length > 0 && (
             <div class="detail-item top-border">
-              <span class="detail-label sans uppercase">Founders</span>
-              <span class="detail-value">{company.founders.join(', ')}</span>
+              <span class="detail-label sans uppercase">Links</span>
+              <span class="detail-value">
+                {company.socialMedia.map((link: any, index: number) => (
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" class="social-link">
+                    {link.text}{index < company.socialMedia.length - 1 && ', '}
+                  </a>
+                ))}
+              </span>
             </div>
           )}
         </div>
@@ -229,9 +248,9 @@ const company = await sanityClient.fetch(
           <div class="portfolio-count sans">{formattedCount}</div>
           <div class="company-name-info">Companies</div>
           <div class="portfolio-sorts">
-            <span class="portfolio-sort" data-sort="az">A-Z,</span>
-            <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
-            <span class="portfolio-sort" data-sort="newest">Newest</span>
+            <span class="portfolio-sort" data-sort="az" class:list={[defaultSort === 'az' && 'active']}>A-Z,</span>
+            <span class="portfolio-sort" data-sort="oldest" class:list={[defaultSort === 'oldest' && 'active']}>Oldest,</span>
+            <span class="portfolio-sort" data-sort="newest" class:list={[defaultSort === 'newest' && 'active']}>Newest</span>
           </div>
         </div>
       
@@ -254,7 +273,7 @@ const company = await sanityClient.fetch(
             {company.mainImage && (
               <div class="company-image">
                 <img 
-                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                  src={urlFor(company.thumbnailImage).width(1200).height(1200).quality(100).fit('max').url()} 
                   alt={company.thumbnailImage.alt || company.name}
                 />
               </div>
@@ -444,11 +463,7 @@ const company = await sanityClient.fetch(
       });
     });
     
-    // Set default active sort (A-Z) by triggering click
-    const azSort = document.querySelector<HTMLElement>('[data-sort="az"]');
-    if (azSort) {
-      azSort.click();
-    }
+    // Default sort is applied server-side; active class set via class:list
   }
 
   // Initialize based on document state

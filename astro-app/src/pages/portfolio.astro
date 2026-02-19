@@ -4,9 +4,10 @@ import { sanityClient } from "sanity:client";
 import groq from "groq";
 import { urlFor } from '../utils/image';
 
-const portfolio = await sanityClient.fetch(
+const portfolioRaw = await sanityClient.fetch(
   groq`*[_type == "portfolio"][0]{
     portfolioText,
+    defaultSort,
     featuredCompanies[]->{
       _id,
       name,
@@ -29,6 +30,25 @@ const portfolio = await sanityClient.fetch(
     }
   }`
 );
+
+function sortCompanies(companies: any[], sortType: string) {
+  if (!companies?.length) return companies;
+  const sorted = [...companies];
+  if (sortType === 'az') {
+    sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sortType === 'oldest') {
+    sorted.sort((a, b) => (new Date(a.investmentDate || 0)).getTime() - (new Date(b.investmentDate || 0)).getTime());
+  } else if (sortType === 'newest') {
+    sorted.sort((a, b) => (new Date(b.investmentDate || 0)).getTime() - (new Date(a.investmentDate || 0)).getTime());
+  }
+  return sorted;
+}
+
+const defaultSort = portfolioRaw?.defaultSort || 'az';
+const portfolio = {
+  ...portfolioRaw,
+  companies: sortCompanies(portfolioRaw?.companies || [], defaultSort),
+};
 
 function formatDate(dateString: string) {
   if (!dateString) return null;
@@ -67,7 +87,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
                   <a href={`/portfolio/${company.slug.current}`} class="company-image">
                     {company.thumbnailImage && (
                       <img 
-                        src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                        src={urlFor(company.thumbnailImage).width(1200).height(1200).quality(100).fit('max').url()} 
                         alt={company.thumbnailImage.alt || company.name}
                       />
                     )}
@@ -96,9 +116,9 @@ const formattedCount = companyCount.toString().padStart(2, '0');
           <div class="portfolio-count sans">{formattedCount}</div>
           <div class="company-name-info">Companies</div>
           <div class="portfolio-sorts">
-            <span class="portfolio-sort" data-sort="az">A-Z,</span>
-            <span class="portfolio-sort" data-sort="oldest">Oldest,</span>
-            <span class="portfolio-sort" data-sort="newest">Newest</span>
+            <span class="portfolio-sort" data-sort="az" class:list={[defaultSort === 'az' && 'active']}>A-Z,</span>
+            <span class="portfolio-sort" data-sort="oldest" class:list={[defaultSort === 'oldest' && 'active']}>Oldest,</span>
+            <span class="portfolio-sort" data-sort="newest" class:list={[defaultSort === 'newest' && 'active']}>Newest</span>
           </div>
         </div>
       
@@ -121,7 +141,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
             {company.thumbnailImage && (
               <div class="company-image">
                 <img 
-                  src={urlFor(company.thumbnailImage).width(400).height(400).url()} 
+                  src={urlFor(company.thumbnailImage).width(1200).height(1200).quality(100).fit('max').url()} 
                   alt={company.thumbnailImage.alt || company.name}
                 />
               </div>
@@ -367,11 +387,7 @@ const formattedCount = companyCount.toString().padStart(2, '0');
         });
       });
       
-      // Set default active sort (A-Z) by triggering click
-      const azSort = document.querySelector<HTMLElement>('[data-sort="az"]');
-      if (azSort) {
-        azSort.click();
-      }
+      // Default sort is applied server-side; active class set via class:list
     }
   }
 

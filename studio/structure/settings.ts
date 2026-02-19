@@ -1,4 +1,4 @@
-import { ControlsIcon, DocumentIcon, MenuIcon, TagsIcon, RobotIcon, TagIcon } from '@sanity/icons'
+import { ControlsIcon } from '@sanity/icons'
 import { StructureBuilder } from 'sanity/structure'
 
 export default (S: StructureBuilder) => [
@@ -6,19 +6,9 @@ export default (S: StructureBuilder) => [
     .title('Settings')
     .icon(ControlsIcon)
     .child(
-      S.list()
+      S.document()
+        .schemaType('siteSettings')
+        .documentId('siteSettings')
         .title('Settings')
-        .items([
-          // S.listItem()
-          //   .title('Meta')
-          //   .icon(RobotIcon)
-          //   .child(S.document().schemaType('meta').documentId('meta').title('Meta')),
-          // S.listItem()
-          //   .title('Navigation')
-          //   .icon(MenuIcon)
-          //   .child(
-          //     S.document().schemaType('navigation').documentId('navigation').title('Navigation')
-          //   ),
-        ])
-    )
+    ),
 ]

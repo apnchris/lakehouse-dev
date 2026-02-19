@@ -1,6 +1,9 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+import { urlFor } from "../utils/image";
 
 // https://docs.astro.build/en/guides/view-transitions/
 import { ViewTransitions } from 'astro:transitions';
@@ -15,6 +18,21 @@ interface Props {
 }
 
 const { title, pageSlug, backgroundColor } = Astro.props;
+
+const siteSettings = await sanityClient.fetch(
+  groq`*[_type == "siteSettings"][0]{
+    favicon,
+    sharePreviewImage
+  }`
+);
+
+const faviconUrl = siteSettings?.favicon
+  ? urlFor(siteSettings.favicon).width(32).height(32).url()
+  : null;
+
+const sharePreviewUrl = siteSettings?.sharePreviewImage
+  ? urlFor(siteSettings.sharePreviewImage).width(1200).height(630).url()
+  : null;
 ---
 
 <!DOCTYPE html>
@@ -25,17 +43,26 @@ const { title, pageSlug, backgroundColor } = Astro.props;
       name="viewport"
       content="width=device-width"
     />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
+    {faviconUrl ? (
+      <link rel="icon" type="image/png" href={faviconUrl} />
+    ) : (
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    )}
     <meta
       name="generator"
       content={Astro.generator}
     />
 
     <title>{title}</title>
+    {sharePreviewUrl && (
+      <>
+        <meta property="og:image" content={sharePreviewUrl} />
+        <meta property="og:title" content={title} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={sharePreviewUrl} />
+        <meta name="twitter:title" content={title} />
+      </>
+    )}
     <ViewTransitions />
   </head>
   <body data-page={pageSlug || 'home'}>

@@ -8,6 +8,9 @@ import textImage from './objects/textImage'
 import fullscreenImage from './objects/fullscreenImage'
 import videoPlayer from './objects/videoPlayer'
 
+// Settings
+import siteSettings from './documents/siteSettings'
+
 // Homepage
 import homepage from './documents/homepage'
 
@@ -30,6 +33,7 @@ export const schemaTypes = [
   fullscreenImage,
   videoPlayer,
 
+  siteSettings,
   homepage,
   
   company,

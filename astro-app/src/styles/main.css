@@ -27,12 +27,24 @@ html[data-bg-color="white"] {
   background-color: #FAF7F4;
 }
 
+html[data-bg-color="white"] header:not(.at-top)::before {
+  background: linear-gradient(to bottom, #FAF7F4 55%, #FAF7F400);
+}
+
 html[data-bg-color="blue"] {
   background-color: #E7F2FF;
 }
 
+html[data-bg-color="blue"] header:not(.at-top)::before {
+  background: linear-gradient(to bottom, #E7F2FF 55%, #E7F2FF00);
+}
+
 html[data-bg-color="green"] {
   background-color: #E8EFE8;
+}
+
+html[data-bg-color="green"] header:not(.at-top)::before {
+  background: linear-gradient(to bottom, #E8EFE8 55%, #E8EFE800);
 }
 
 body {
@@ -55,7 +67,31 @@ header {
   left: 0;
   width: 100%;
   z-index: 100;
+  transition: transform .2s ease, opacity .2s ease, background .2s ease;
 }
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 40px);
+  pointer-events: none;
+  transition: opacity .4s ease;
+  opacity: 0;
+  z-index: -1;
+}
+
+header:not(.at-top)::before {
+  opacity: 1;
+}
+
+header.hide {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
 
 body[data-page='home'] footer {
   position: fixed;
@@ -82,6 +118,10 @@ footer {
 
 .header-logo svg {
   fill: currentColor;
+}
+
+header:not(.at-top) {
+  color: #2E2929;
 }
 
 .header-links,
@@ -336,7 +376,7 @@ body {
   line-height: 19px;
 }
 
-header,
+/* header, */
 header nav,
 header nav menu.regular-grid {
   display: contents;
@@ -367,6 +407,15 @@ footer menu.regular-grid {
   right: 0;
   z-index: 100;
   transition: color .2s ease;
+}
+
+header:not(.at-top) .header-links,
+header:not(.at-top) .header-logo {
+  color: #2E2929!important;
+}
+
+header::before {
+  height: calc(100% + 50px);
 }
 
 .header-links a {

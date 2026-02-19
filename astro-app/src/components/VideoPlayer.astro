@@ -11,7 +11,7 @@ const { videoPoster, videoFile, videoCdn } = Astro.props;
 
 // Determine the video source - prefer CDN, then uploaded file
 const videoSrc = videoCdn || (videoFile?.asset?.url);
-const posterSrc = videoPoster ? urlFor(videoPoster).width(1920).url() : undefined;
+const posterSrc = videoPoster ? urlFor(videoPoster).width(1920).quality(100).url() : undefined;
 
 // Generate unique ID for this video player instance
 const playerId = `video-${Math.random().toString(36).substr(2, 9)}`;

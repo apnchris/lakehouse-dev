@@ -1,8 +1,25 @@
+---
+import { sanityClient } from "sanity:client";
+import groq from "groq";
+
+const siteSettings = await sanityClient.fetch(
+  groq`*[_type == "siteSettings"][0]{ getInTouchEmail }`
+);
+---
+
 <footer>
   <menu class="regular-grid">
-    <li class="header-element header-contact hide-desktop">
-      <a href="#" class="back-hover">Get in Touch</a>
-    </li>
+    {siteSettings?.getInTouchEmail && (
+      <li class="header-element header-contact hide-desktop">
+        <button
+          type="button"
+          class="header-contact-btn back-hover"
+          data-email={siteSettings.getInTouchEmail}
+        >
+          Get in Touch
+        </button>
+      </li>
+    )}
 
     <li class="current-location hide-mobile">
       New York, NY
@@ -35,3 +52,13 @@
   updateClock();
   setInterval(updateClock, 1000);
 </script>
+
+<style>
+  .header-contact-btn {
+    all: unset;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    position: relative;
+  }
+</style>

@@ -37,7 +37,7 @@ const team = await sanityClient.fetch(
             {member.mainImage && (
               <a href={`/team/${member.slug.current}`} class="member-image">
                 <img 
-                  src={urlFor(member.mainImage).width(400).height(400).url()} 
+                  src={urlFor(member.mainImage).width(1000).height(1000).quality(100).fit('max').url()} 
                   alt={member.mainImage.alt || member.name}
                 />
               </a>

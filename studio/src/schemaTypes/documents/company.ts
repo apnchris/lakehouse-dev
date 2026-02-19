@@ -62,10 +62,14 @@ export default defineType({
       type: 'string',
     }),
     defineField({
-      name: 'socialMedia',
-      title: 'Social media',
+      name: 'founders',
+      title: 'Founders',
       type: 'array',
-      of: [{type: 'link'}],
+      of: [{
+        name: 'founder',
+        title: 'Founder',
+        type: 'string',
+      }],
     }),
     defineField({
       name: 'investmentStage',
@@ -86,14 +90,10 @@ export default defineType({
       type: 'string',
     }),
     defineField({
-      name: 'founders',
-      title: 'Founders',
+      name: 'socialMedia',
+      title: 'Links',
       type: 'array',
-      of: [{
-        name: 'founder',
-        title: 'Founder',
-        type: 'string',
-      }],
+      of: [{type: 'link'}],
     }),
     defineField({
       name: 'backgroundColor',
