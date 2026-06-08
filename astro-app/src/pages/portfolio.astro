@@ -89,6 +89,8 @@ const formattedCount = companyCount.toString().padStart(2, '0');
                       <img 
                         src={urlFor(company.thumbnailImage).width(1200).height(1200).quality(100).fit('max').url()} 
                         alt={company.thumbnailImage.alt || company.name}
+                        loading="lazy"
+                        decoding="async"
                       />
                     )}
                   </a>
@@ -143,6 +145,8 @@ const formattedCount = companyCount.toString().padStart(2, '0');
                 <img 
                   src={urlFor(company.thumbnailImage).width(1200).height(1200).quality(100).fit('max').url()} 
                   alt={company.thumbnailImage.alt || company.name}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             )}

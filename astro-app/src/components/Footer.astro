@@ -26,9 +26,7 @@ const siteSettings = await sanityClient.fetch(
       <span class="current-time sans uppercase"></span>
     </li>
     
-    <li class="current-date hide-mobile">
-      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-    </li>
+    <li class="current-date hide-mobile"></li>
   </menu>
 </footer>
 
@@ -42,13 +40,28 @@ const siteSettings = await sanityClient.fetch(
       second: '2-digit',
       hour12: true
     });
-    
+
     const timeElement = document.querySelector('.current-time');
     if (timeElement) {
       timeElement.textContent = timeString;
     }
   }
 
+  function updateDate() {
+    const dateString = new Date().toLocaleDateString('en-US', {
+      timeZone: 'America/New_York',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    const dateElement = document.querySelector('.current-date');
+    if (dateElement) {
+      dateElement.textContent = dateString;
+    }
+  }
+
+  updateDate();
   updateClock();
   setInterval(updateClock, 1000);
 </script>
